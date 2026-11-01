@@ -1,20 +1,30 @@
 /**
  * Publishes every public package whose current version is not on npm yet.
- * Uses `bun publish`, which rewrites `workspace:` ranges to real versions,
- * then lets Changesets create the git tags.
+ * `bun pm pack` rewrites `workspace:` ranges to real versions, and `npm publish`
+ * uploads the tarball through npm trusted publishing (OIDC, no token needed).
+ * Changesets then creates the git tags, which the release action turns into
+ * GitHub releases.
  */
 
-import { readdirSync } from "node:fs";
+import { mkdtempSync, readdirSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { $ } from "bun";
 
 const root = join(import.meta.dir, "..");
 const packagesDir = join(root, "packages");
+const outDir = mkdtempSync(join(tmpdir(), "seintje-publish-"));
 
 for (const dir of readdirSync(packagesDir)) {
   const cwd = join(packagesDir, dir);
   const pkg = await Bun.file(join(cwd, "package.json")).json();
   if (pkg.private) continue;
+
+  const latest = await $`npm view ${pkg.name} version`.quiet().nothrow();
+  const npmVersion = latest.exitCode === 0 ? latest.stdout.toString().trim() : null;
+  if (npmVersion && Bun.semver.order(npmVersion, pkg.version) > 0) {
+    throw new Error(`${pkg.name}@${npmVersion} on npm is newer than package.json (${pkg.version})`);
+  }
 
   const published = await $`npm view ${`${pkg.name}@${pkg.version}`} version`.quiet().nothrow();
   if (published.exitCode === 0 && published.stdout.toString().trim() === pkg.version) {
@@ -23,7 +33,8 @@ for (const dir of readdirSync(packagesDir)) {
   }
 
   console.log(`Publishing ${pkg.name}@${pkg.version}`);
-  await $`bun publish --access public`.cwd(cwd);
+  const tarball = (await $`bun pm pack --destination ${outDir} --quiet`.cwd(cwd).text()).trim();
+  await $`npm publish ${tarball} --access public`.cwd(cwd);
 }
 
 await $`bunx changeset tag`.cwd(root);
