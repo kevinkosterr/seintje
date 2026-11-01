@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seintje · vanilla</title>
+    <link rel="stylesheet" href="./src/page.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Seintje <small>vanilla</small></h1>
+      <section class="controls">
+        <fieldset>
+          <legend>Toasts</legend>
+          <button type="button" data-demo="neutral">Neutral</button>
+          <button type="button" data-demo="success">Success</button>
+          <button type="button" data-demo="info">Info</button>
+          <button type="button" data-demo="warning">Warning</button>
+          <button type="button" data-demo="error">Error</button>
+          <button type="button" data-demo="action">With action</button>
+          <button type="button" data-demo="promise">Promise</button>
+          <button type="button" data-demo="persistent">Persistent</button>
+          <button type="button" data-demo="custom">Custom content</button>
+          <button type="button" data-demo="dismiss">Dismiss all</button>
+        </fieldset>
+        <fieldset>
+          <legend>Toaster</legend>
+          <label>Position
+            <select id="position">
+              <option>top-left</option><option>top-center</option><option>top-right</option>
+              <option>bottom-left</option><option>bottom-center</option><option selected>bottom-right</option>
+            </select>
+          </label>
+          <label>Theme
+            <select id="theme"><option>system</option><option>light</option><option>dark</option></select>
+          </label>
+          <label>Motion
+            <select id="motion"><option>system</option><option>full</option><option>reduce</option></select>
+          </label>
+        </fieldset>
+      </section>
+    </main>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
