@@ -1,0 +1,99 @@
+---
+title: Vanilla JavaScript
+description: Use Seintje without a framework, with or without a bundler.
+---
+
+import Demo from "../../../components/Demo.astro";
+
+The `seintje` package needs no framework. It is the same code the Vue and Svelte packages run.
+
+## With a bundler
+
+```ts
+import { createToaster, seintje } from "seintje";
+import "seintje/styles.css";
+
+const toaster = createToaster(document.body, {
+  position: "top-center",
+  theme: "system",
+});
+
+seintje.info("Hello");
+
+// Later, for example when settings change:
+toaster.update({ position: "bottom-left" });
+
+// And when tearing the page down:
+toaster.destroy();
+```
+
+`createToaster` takes an element or a CSS selector. It appends its own root element there and
+returns `{ element, update, destroy }`.
+
+## Without a bundler
+
+The package ships a self-contained ES module build with `motion` included. Load it from a CDN:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/seintje/dist/styles.css" />
+
+<script type="module">
+  import { createToaster, seintje } from "https://cdn.jsdelivr.net/npm/seintje/dist/browser/seintje.js";
+
+  createToaster(document.body);
+  seintje.success("No build step needed");
+</script>
+```
+
+## Rich content
+
+`description` and `icon` accept three kinds of content:
+
+| Content | Example |
+| --- | --- |
+| Text | `"Saved"` |
+| A DOM node | `document.createElement("img")` |
+| A renderer | `(slot) => { slot.innerHTML = "<b>Hi</b>"; return () => {} }` |
+
+A renderer receives an empty element owned by Seintje. Whatever it returns is called when the
+content is replaced or the toast is removed, so you can clean up listeners or unmount a widget.
+
+```ts
+seintje.show({
+  title: "Live price",
+  description: (slot) => {
+    const update = () => (slot.textContent = `€ ${(Math.random() * 100).toFixed(2)}`);
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  },
+  duration: 8000,
+});
+```
+
+## Updating a toast
+
+Every call returns the toast's id. Reuse it to change the toast in place. Seintje closes the
+toast first if it is open, swaps the content, and crossfades the header.
+
+```ts
+const id = seintje.loading("Exporting");
+// ...
+seintje.update(id, { type: "success", title: "Exported", duration: 4000 });
+```
+
+For the common case there is `seintje.promise`:
+
+```ts
+await seintje.promise(fetch("/api/export"), {
+  loading: "Exporting",
+  success: "Exported",
+  error: (err) => ({ title: "Export failed", description: String(err) }),
+});
+```
+
+<Demo set="promise" />
+
+## Positions
+
+<Demo set="positions" />

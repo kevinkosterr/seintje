@@ -1,0 +1,26 @@
+---
+title: Toaster options
+description: Options of createToaster and the Toaster components.
+---
+
+```ts
+const toaster = createToaster(target, options);
+toaster.update(partialOptions);
+toaster.destroy();
+```
+
+`target` is an element or a CSS selector, and defaults to `document.body`.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `position` | `Position` | `"bottom-right"` | Where toasts without their own position go. |
+| `theme` | `"light" \| "dark" \| "system"` | `"system"` | Colour scheme. |
+| `offset` | `number \| string \| { top?, right?, bottom?, left? }` | `16px` | Distance from the viewport edges. Numbers are pixels. |
+| `defaults` | `Partial<ToastOptions>` | — | Applied under every toast's own options. |
+| `motion` | `"system" \| "reduce" \| "full"` | `"system"` | Whether to reduce motion. |
+| `store` | `Store` | default store | The store to render. Fixed after creation. |
+| `label` | `string` | `"Notifications"` | Accessible name of the toaster. |
+| `hotkey` | `string \| false` | `"Alt+T"` | Moves focus to the newest toast. Modifiers: `Alt`, `Ctrl`, `Shift`, `Meta`. |
+| `className` | `string` | — | Class on the toaster root. |
+
+Render one toaster per store. Two toasters on the same store would both draw every toast.

@@ -1,0 +1,62 @@
+---
+title: seintje API
+description: Methods for showing, updating and dismissing toasts.
+---
+
+`seintje` works on the default store. Each framework package exports a version that also
+accepts its own content. `createApi(store)` gives you the same methods for another store.
+
+Each method that shows a toast accepts either a title string or [toast options](/reference/toast-options/),
+and returns the toast's id.
+
+## `seintje.show(input)`
+
+Shows a toast of `options.type`, or `neutral` when no type is given.
+
+## `seintje.success(input)`, `info`, `warning`, `error`
+
+Show a toast of that type.
+
+## `seintje.loading(input)`
+
+Shows a spinner. Loading toasts never time out unless you pass a `duration`, and never open.
+
+## `seintje.promise(promise, options)`
+
+Shows a loading toast, then turns it into a success or error toast when the promise settles.
+Returns the original promise, so `await` it or attach `.catch()` if it may reject.
+
+```ts
+seintje.promise(saveDraft(), {
+  loading: "Saving",
+  success: (draft) => ({ title: "Saved", description: `Version ${draft.version}` }),
+  error: (err) => ({ title: "Not saved", description: String(err) }),
+  shared: { position: "top-center" },
+});
+```
+
+| Option | Type |
+| --- | --- |
+| `loading` | `string \| ToastOptions` |
+| `success` | `string \| ToastOptions`, or a function of the resolved value |
+| `error` | `string \| ToastOptions`, or a function of the rejection reason |
+| `shared` | options applied to all three stages |
+
+The promise may also be a function that returns one.
+
+## `seintje.update(id, input)`
+
+Merges new options into a toast that is on screen. Returns `false` if there is no such toast.
+Passing `type` changes the type.
+
+## `seintje.dismiss(id?)`
+
+Starts the exit of one toast, or of all toasts when no id is given.
+
+## `seintje.clear(position?)`
+
+Removes toasts immediately, without an exit animation. Pass a position to only clear that one.
+
+## `seintje.store`
+
+The [store](/reference/stores/) the API writes to.

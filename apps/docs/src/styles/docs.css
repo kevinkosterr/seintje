@@ -1,0 +1,21 @@
+.seintje-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block: 1rem;
+}
+
+.seintje-demo button {
+  font: inherit;
+  font-size: var(--sl-text-sm);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--sl-color-gray-5);
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+  cursor: pointer;
+}
+
+.seintje-demo button:hover {
+  border-color: var(--sl-color-accent);
+}
