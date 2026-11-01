@@ -296,6 +296,16 @@ describe("expanding", () => {
     expect(pill?.getAttribute("x")).toBe("0");
   });
 
+  test("the panel shares the pill's span so the shape grows as one piece", () => {
+    const { api } = setup({ position: "bottom-right" });
+    api.show({ title: "Narrow", description: "Not open yet." });
+    const pill = host.querySelector("[data-seintje-pill]");
+    const panel = host.querySelector("[data-seintje-panel]");
+    expect(Number(pill?.getAttribute("width"))).toBeLessThan(TOAST_WIDTH);
+    expect(panel?.getAttribute("x")).toBe(pill?.getAttribute("x"));
+    expect(panel?.getAttribute("width")).toBe(pill?.getAttribute("width"));
+  });
+
   test("uses Lucide icons", () => {
     const { api } = setup();
     api.success("Done");
