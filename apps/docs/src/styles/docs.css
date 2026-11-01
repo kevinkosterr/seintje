@@ -19,3 +19,8 @@
 .seintje-demo button:hover {
   border-color: var(--sl-color-accent);
 }
+
+.hero img,
+.sl-markdown-content img {
+  border-radius: 1rem;
+}

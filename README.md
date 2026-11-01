@@ -4,6 +4,11 @@ Framework-agnostic toast notifications, with thin adapters for Vue and Svelte.
 
 _Seintje_ is Dutch for "a little heads-up".
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="apps/docs/src/assets/screenshots/hero-dark.png">
+  <img alt="A stack of Seintje toasts: an expanded success card, an info toast with an Undo action, a loading pill and a neutral pill" src="apps/docs/src/assets/screenshots/hero-light.png">
+</picture>
+
 | Package                              | Description                                                      |
 | ------------------------------------ | ---------------------------------------------------------------- |
 | [`seintje`](packages/seintje)        | The core. Plain TypeScript and DOM, works without any framework. |
@@ -24,7 +29,7 @@ and icons come from [Lucide](https://lucide.dev).
 
 ## Features
 
-- A compact pill that stretches into a full-width card for descriptions and actions
+- A compact pill that stretches into a full-width card for descriptions, with actions next to or under the title
 - Springs that keep their momentum when interrupted
 - `seintje.promise()` for loading → success / error flows, with in-place content swaps
 - Swipe, close button and <kbd>Escape</kbd> to dismiss; <kbd>Alt</kbd>+<kbd>T</kbd> to focus
@@ -32,6 +37,8 @@ and icons come from [Lucide](https://lucide.dev).
 - Timers that pause on hover, focus and hidden tabs, and resume where they left off
 - Respects `prefers-reduced-motion`
 - Light, dark and system themes, CSS variables, and per-part classes
+
+![Every toast type in the light and the dark theme](apps/docs/src/assets/screenshots/types.png)
 
 ## Repository
 

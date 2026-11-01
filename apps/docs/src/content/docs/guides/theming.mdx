@@ -3,7 +3,9 @@ title: Theming
 description: Colours, classes and CSS variables.
 ---
 
+import { Image } from "astro:assets";
 import Demo from "../../../components/Demo.astro";
+import types from "../../../assets/screenshots/types.png";
 
 ## Light, dark and system
 
@@ -15,21 +17,61 @@ gives dark toasts, `dark` gives light toasts, and `system` (the default) follows
 createToaster(document.body, { theme: "dark" });
 ```
 
+<Image src={types} alt="Every toast type, as light toasts on a dark page and dark toasts on a light page" />
+
 ## CSS variables
 
-Override these on `[data-seintje]` or on a single theme.
+Override these on `[data-seintje]` or on a single theme (`[data-seintje][data-theme="light"]`
+or `[data-seintje][data-theme="dark"]`). The light colours are the defaults on `[data-seintje]`
+and the dark colours override them on `[data-seintje][data-theme="dark"]`, so to change a colour
+in both themes, set it on both selectors.
 
-| Variable | Purpose |
+### Colours
+
+| Variable | Purpose | `light` default | `dark` default |
+| --- | --- | --- | --- |
+| `--seintje-fill` | Background of the toast shape. The `fill` option overrides it per toast | `#1b1b1f` | `#f4f4f5` |
+| `--seintje-text` | Base text colour of the title bar, inherited by custom content there, and the close button on hover | `#f6f6f7` | `#18181b` |
+| `--seintje-muted` | Description and close button colour | `rgb(246 246 247 / 0.64)` | `rgb(24 24 27 / 0.64)` |
+| `--seintje-focus` | Focus ring of the toast and its buttons | `#8ab4ff` | `#2f6fe0` |
+| `--seintje-neutral` | Tone of `neutral` toasts | `#f6f6f7` | `#18181b` |
+| `--seintje-success` | Tone of `success` toasts | `oklch(0.8 0.17 152)` | `oklch(0.56 0.15 152)` |
+| `--seintje-info` | Tone of `info` toasts | `oklch(0.77 0.12 236)` | `oklch(0.55 0.14 245)` |
+| `--seintje-warning` | Tone of `warning` toasts | `oklch(0.85 0.15 82)` | `oklch(0.62 0.14 66)` |
+| `--seintje-error` | Tone of `error` toasts | `oklch(0.72 0.18 24)` | `oklch(0.56 0.2 26)` |
+| `--seintje-loading` | Tone of `loading` toasts | `rgb(246 246 247 / 0.7)` | `rgb(24 24 27 / 0.62)` |
+
+The tone colours the icon, the title and the action button, whose background is the tone mixed
+with transparency. Each toast copies the tone of its type into `--seintje-tone`, which you can
+also set directly on a toast, for example through its `className`:
+
+```css
+[data-seintje] [data-seintje-toast].billing {
+  --seintje-tone: #c4a1ff;
+}
+```
+
+### Shape and layout
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `--seintje-radius` | Corner radius of the toast shape, in `px`. The `radius` option overrides it | `18px` (not set) |
+| `--seintje-font` | Font stack | `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif` |
+| `--seintje-gap` | Space between stacked toasts | `10px` |
+| `--seintje-z` | `z-index` of the toaster | `2147483000` |
+| `--seintje-offset-top`, `--seintje-offset-right`, `--seintje-offset-bottom`, `--seintje-offset-left` | Distance of the stacks from the viewport edges. The `offset` option sets them as inline styles, which take precedence over your stylesheet | `16px` |
+
+### Set by Seintje
+
+These are part of the shape's geometry, which is computed in script. They are listed so you can
+read them in your own styles; changing them throws the markup out of line with the shape.
+
+| Variable | Value |
 | --- | --- |
-| `--seintje-fill` | Background of the toast shape |
-| `--seintje-text` | Main text colour |
-| `--seintje-muted` | Description colour |
-| `--seintje-focus` | Focus ring colour |
-| `--seintje-neutral`, `--seintje-success`, `--seintje-info`, `--seintje-warning`, `--seintje-error`, `--seintje-loading` | Tone of the icon, title and action per type |
-| `--seintje-font` | Font stack |
-| `--seintje-gap` | Space between stacked toasts |
-| `--seintje-z` | `z-index` of the toaster |
-| `--seintje-offset-top` (and `-right`, `-bottom`, `-left`) | Distance from the edges, also set by the `offset` option |
+| `--seintje-width` | Width of the toasts and stacks, `356px`. Set inline on the toaster root |
+| `--seintje-head` | Height of the collapsed pill, `44px` |
+| `--seintje-head-size` | Measured height of a toast's title bar. Grows past `--seintje-head` when the action sits below the title |
+| `--seintje-tone` | Tone of the toast's type, see above |
 
 ```css
 [data-seintje][data-theme="light"] {
@@ -37,6 +79,10 @@ Override these on `[data-seintje]` or on a single theme.
   --seintje-success: #7ef0b0;
 }
 ```
+
+`--seintje-radius` is read whenever a toast is shown or updated, so set it on `[data-seintje]`,
+a theme or a type such as `[data-seintje-toast][data-type="error"]`. Only pixel values are
+supported. The `radius` option takes precedence over it.
 
 The title bar's height (44px) and the toast width (356px) are fixed so the shape can be computed
 in script.
@@ -88,15 +134,33 @@ Every part has a `data-seintje-*` attribute you can target:
 ```
 section[data-seintje][data-theme]
 └─ ol[data-seintje-viewport][data-position]
-   └─ li[data-seintje-toast][data-type][data-open][data-grow]
+   └─ li[data-seintje-toast][data-type][data-open][data-grow][data-align]
       └─ div[data-seintje-card]
          ├─ div[data-seintje-surface] › svg[data-seintje-canvas]
          ├─ div[data-seintje-head]
-         │  ├─ div[data-seintje-headings] › div[data-seintje-heading]
-         │  │     ├─ span[data-seintje-icon]
-         │  │     └─ span[data-seintje-title]
-         │  └─ button[data-seintje-close]
+         │  ├─ div[data-seintje-head-row]
+         │  │  ├─ div[data-seintje-headings] › div[data-seintje-heading]
+         │  │  │     ├─ span[data-seintje-icon]
+         │  │  │     └─ span[data-seintje-title]
+         │  │  ├─ button[data-seintje-action]   (actionPlacement: "inline", default)
+         │  │  └─ button[data-seintje-close]
+         │  └─ div[data-seintje-actions]
+         │        └─ button[data-seintje-action]   (actionPlacement: "below")
          └─ div[data-seintje-body] › div[data-seintje-body-inner]
-               ├─ div[data-seintje-description]
-               └─ button[data-seintje-action]
+               └─ div[data-seintje-description]
 ```
+
+The state attributes you can style:
+
+| Attribute | On | Values |
+| --- | --- | --- |
+| `data-theme` | toaster root | `light` or `dark`, the resolved `theme` |
+| `data-position` | viewport | one of the six positions |
+| `data-type` | toast, heading, action | the toast type |
+| `data-open` | toast | `true` while the description is showing, else `false` |
+| `data-grow` | toast | `down` for top positions, `up` for bottom positions |
+| `data-align` | toast | `start`, `center` or `end`, from the position |
+| `data-action-visibility` | toast | `always` or `hover`, when the toast has an action |
+| `data-swiping` | toast | present while the toast is dragged |
+| `data-closing` | toast | present while the toast animates out |
+| `data-leaving` | heading | present on the old title while it fades out after an update |

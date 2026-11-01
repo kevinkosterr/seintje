@@ -11,6 +11,14 @@ toaster.destroy();
 
 `target` is an element or a CSS selector, and defaults to `document.body`.
 
+The returned toaster has:
+
+| Member | Description |
+| --- | --- |
+| `element` | The toaster root, `section[data-seintje]`. |
+| `update(options)` | Merges new options into the current ones. `store` cannot be changed. |
+| `destroy()` | Removes the toaster and its listeners. The toasts stay in the store. |
+
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `position` | `Position` | `"bottom-right"` | Where toasts without their own position go. |

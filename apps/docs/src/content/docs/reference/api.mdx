@@ -60,3 +60,17 @@ Removes toasts immediately, without an exit animation. Pass a position to only c
 ## `seintje.store`
 
 The [store](../stores/) the API writes to.
+
+## Constants
+
+Besides the functions and types, `seintje` exports the values it uses as defaults:
+
+| Export | Value |
+| --- | --- |
+| `DEFAULT_DURATION` | `5000`, milliseconds before a toast is dismissed |
+| `EXIT_MS` | `450`, milliseconds a dismissed toast is kept for its exit animation |
+| `HEAD_HEIGHT` | `44`, height of the collapsed pill in pixels |
+| `TOAST_WIDTH` | `356`, width of a toast in pixels |
+| `POSITIONS` | the six positions, `top-left` to `bottom-right` |
+| `DEFAULT_TITLES` | the title of each type when a toast has none |
+| `SPRING`, `SPRING_FLAT` | the springs of the open and close animations, in [Motion](https://motion.dev) format |

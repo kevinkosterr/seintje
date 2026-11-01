@@ -4,6 +4,11 @@ Framework-agnostic toast notifications. Works in any page, with or without a
 framework. For Vue and Svelte, see [`@seintje/vue`](https://www.npmjs.com/package/@seintje/vue)
 and [`@seintje/svelte`](https://www.npmjs.com/package/@seintje/svelte).
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/kevinkosterr/seintje/master/apps/docs/src/assets/screenshots/hero-dark.png">
+  <img alt="A stack of Seintje toasts: an expanded success card, an info toast with an Undo action, a loading pill and a neutral pill" src="https://raw.githubusercontent.com/kevinkosterr/seintje/master/apps/docs/src/assets/screenshots/hero-light.png">
+</picture>
+
 ```sh
 npm install seintje
 ```

@@ -6,20 +6,22 @@ description: Everything a single toast can be configured with.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `id` | `string` | generated | Reusing an id replaces that toast's content in place. |
-| `title` | `string` | name of the type | Shown in the pill. |
+| `title` | `string` | name of the type | Shown in the pill. The defaults are in `DEFAULT_TITLES`: Notification, Success, Info, Warning, Error and Loading. |
 | `description` | `Content` | — | Shown when the toast opens. |
 | `type` | `"neutral" \| "success" \| "info" \| "warning" \| "error" \| "loading"` | set by the method | Icon and tone. |
 | `icon` | `Content \| null` | [Lucide](https://lucide.dev) icon of the type | `null` hides the icon. |
 | `position` | `Position` | the toaster's | One of `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, `bottom-right`. |
-| `duration` | `number \| null` | `5000` | Milliseconds until it is dismissed. `null` or `Infinity` keeps it. |
-| `action` | `{ label, onClick, dismiss? }` | — | A button in the body. `onClick(event, toast)` gets `{ id, dismiss }`. Set `dismiss: true` to close the toast after the click. |
+| `duration` | `number \| null` | `5000`, `null` for loading toasts | Milliseconds until it is dismissed. `null` or `Infinity` keeps it. |
+| `action` | `{ label, onClick, dismiss? }` | — | A button shown with the title. `onClick(event, toast)` gets `{ id, dismiss }`. Set `dismiss: true` to close the toast after the click. |
+| `actionPlacement` | `"inline" \| "below"` | `"inline"` | `inline` puts the action right next to the title, `below` underneath it. |
+| `actionVisibility` | `"always" \| "hover"` | `"always"` | `hover` only shows the action while the toast is hovered or focused. |
 | `dismissible` | `boolean` | `true` | Allows swipe, the close button and Escape. |
-| `autoExpand` | `boolean \| { delay?, hold? }` | `true` | Opens the body by itself. `delay` is the wait before opening; `hold` how long it stays open. |
+| `autoExpand` | `boolean \| { delay?, hold? }` | `true` | Opens the body by itself when there is a description. `delay` is the wait before opening (default `220`); `hold` how long it stays open (default: until 1.5 s before it is dismissed, or for good when it has no duration). |
 | `fill` | `string` | theme | Background colour of the shape. |
-| `radius` | `number` | `18` | Corner radius in pixels. |
+| `radius` | `number` | `--seintje-radius`, else `18` | Corner radius in pixels. |
 | `important` | `boolean` | `true` for errors | Announce through the assertive live region. |
 | `className` | `string` | — | Class on the toast element. |
-| `classes` | `{ toast?, title?, description?, icon?, action? }` | — | Classes on the toast's parts. |
+| `classes` | `{ toast?, title?, description?, icon?, action? }` | — | Classes on the toast's parts. `toast` is added next to `className`. |
 | `onDismiss` | `(id) => void` | — | Called when the toast starts to leave. |
 
 ## Content
