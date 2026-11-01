@@ -1,0 +1,102 @@
+---
+title: Theming
+description: Colours, classes and CSS variables.
+---
+
+import Demo from "../../../components/Demo.astro";
+
+## Light, dark and system
+
+The toaster's `theme` decides the colour of the toasts. `light` is meant for light pages and
+gives dark toasts, `dark` gives light toasts, and `system` (the default) follows
+`prefers-color-scheme`.
+
+```ts
+createToaster(document.body, { theme: "dark" });
+```
+
+## CSS variables
+
+Override these on `[data-seintje]` or on a single theme.
+
+| Variable | Purpose |
+| --- | --- |
+| `--seintje-fill` | Background of the toast shape |
+| `--seintje-text` | Main text colour |
+| `--seintje-muted` | Description colour |
+| `--seintje-focus` | Focus ring colour |
+| `--seintje-neutral`, `--seintje-success`, `--seintje-info`, `--seintje-warning`, `--seintje-error`, `--seintje-loading` | Tone of the icon, title and action per type |
+| `--seintje-font` | Font stack |
+| `--seintje-gap` | Space between stacked toasts |
+| `--seintje-z` | `z-index` of the toaster |
+| `--seintje-offset-top` (and `-right`, `-bottom`, `-left`) | Distance from the edges, also set by the `offset` option |
+
+```css
+[data-seintje][data-theme="light"] {
+  --seintje-fill: #10233f;
+  --seintje-success: #7ef0b0;
+}
+```
+
+The title bar's height (44px) and the toast width (356px) are fixed so the shape can be computed
+in script.
+
+## Icons
+
+Each type has a [Lucide](https://lucide.dev) icon: `bell`, `circle-check`, `info`,
+`triangle-alert`, `circle-x` and `loader-circle`. Replace one with the `icon` option, which takes
+any content, for example another Lucide icon:
+
+```ts
+import { createElement, Rocket } from "lucide";
+
+seintje.success({ title: "Launched", icon: createElement(Rocket, { width: 18, height: 18 }) });
+```
+
+## Per toast
+
+`fill` changes the background of a single toast, and `radius` its corner radius:
+
+```ts
+seintje.success({ title: "Paid", fill: "#173d2a", radius: 12 });
+```
+
+<Demo set="options" />
+
+## Classes
+
+`className` goes on the toast element. `classes` targets its parts:
+
+```ts
+seintje.show({
+  title: "Styled",
+  description: "With utility classes",
+  classes: { title: "uppercase", description: "italic", icon: "ring", action: "font-bold" },
+});
+```
+
+Set them for every toast with the toaster's `defaults`:
+
+```ts
+createToaster(document.body, { defaults: { classes: { title: "my-title" } } });
+```
+
+## Structure
+
+Every part has a `data-seintje-*` attribute you can target:
+
+```
+section[data-seintje][data-theme]
+└─ ol[data-seintje-viewport][data-position]
+   └─ li[data-seintje-toast][data-type][data-open][data-grow]
+      └─ div[data-seintje-card]
+         ├─ div[data-seintje-surface] › svg[data-seintje-canvas]
+         ├─ div[data-seintje-head]
+         │  ├─ div[data-seintje-headings] › div[data-seintje-heading]
+         │  │     ├─ span[data-seintje-icon]
+         │  │     └─ span[data-seintje-title]
+         │  └─ button[data-seintje-close]
+         └─ div[data-seintje-body] › div[data-seintje-body-inner]
+               ├─ div[data-seintje-description]
+               └─ button[data-seintje-action]
+```

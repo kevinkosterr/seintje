@@ -1,0 +1,43 @@
+---
+title: Accessibility
+description: How Seintje works with screen readers, keyboards and reduced motion.
+---
+
+## Announcements
+
+The toaster keeps two visually hidden live regions. New toasts, and toasts whose content is
+replaced, are read out as "title. description". Errors use the assertive region, everything
+else the polite one. Override this per toast with `important: true` or `important: false`.
+
+Because announcements are separate from the animated markup, screen readers are not flooded
+while toasts move around.
+
+## Markup
+
+- The toaster is a `<section>` with an accessible name (`label`, default "Notifications") that
+  also names the hotkey.
+- Toasts are list items, labelled by their title and described by their description.
+- The close and action controls are real `<button>` elements. Nothing interactive is nested
+  inside another interactive element.
+- A collapsed toast's body is `inert`, so hidden buttons cannot be focused.
+
+## Keyboard
+
+| Key | Effect |
+| --- | --- |
+| <kbd>Alt</kbd>+<kbd>T</kbd> | Moves focus to the newest toast. Change it with the `hotkey` option, or turn it off with `hotkey: false`. |
+| <kbd>Tab</kbd> | Moves between toasts and their buttons. A focused toast opens. |
+| <kbd>Escape</kbd> | Dismisses the focused toast and moves focus to the next one. When none is left, focus goes back to where it was before the hotkey. |
+
+## Time
+
+Every auto-dismiss timer of a toaster pauses while a toast is hovered or focused, and while the
+page is hidden. When it resumes, the toast gets the time it had left, not a fresh start. Use
+`duration: null` for messages people must act on.
+
+## Reduced motion
+
+With `prefers-reduced-motion: reduce`, shapes and layout jump to their new size instead of
+springing, the gooey stretch and swipe drift are skipped, and only short fades remain. The
+toaster's `motion` option overrides the system setting: `"reduce"` always reduces, `"full"`
+never does.

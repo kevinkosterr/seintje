@@ -1,0 +1,29 @@
+---
+title: Toast options
+description: Everything a single toast can be configured with.
+---
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | generated | Reusing an id replaces that toast's content in place. |
+| `title` | `string` | name of the type | Shown in the pill. |
+| `description` | `Content` | — | Shown when the toast opens. |
+| `type` | `"neutral" \| "success" \| "info" \| "warning" \| "error" \| "loading"` | set by the method | Icon and tone. |
+| `icon` | `Content \| null` | [Lucide](https://lucide.dev) icon of the type | `null` hides the icon. |
+| `position` | `Position` | the toaster's | One of `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, `bottom-right`. |
+| `duration` | `number \| null` | `5000` | Milliseconds until it is dismissed. `null` or `Infinity` keeps it. |
+| `action` | `{ label, onClick, dismiss? }` | — | A button in the body. `onClick(event, toast)` gets `{ id, dismiss }`. Set `dismiss: true` to close the toast after the click. |
+| `dismissible` | `boolean` | `true` | Allows swipe, the close button and Escape. |
+| `autoExpand` | `boolean \| { delay?, hold? }` | `true` | Opens the body by itself. `delay` is the wait before opening; `hold` how long it stays open. |
+| `fill` | `string` | theme | Background colour of the shape. |
+| `radius` | `number` | `18` | Corner radius in pixels. |
+| `important` | `boolean` | `true` for errors | Announce through the assertive live region. |
+| `className` | `string` | — | Class on the toast element. |
+| `classes` | `{ toast?, title?, description?, icon?, action? }` | — | Classes on the toast's parts. |
+| `onDismiss` | `(id) => void` | — | Called when the toast starts to leave. |
+
+## Content
+
+In the core, `Content` is a string, a DOM `Node`, or a renderer
+`(slot: HTMLElement) => void | (() => void)`. The Vue package also accepts VNodes and
+components; the Svelte package accepts snippets and `{ component, props }`.
