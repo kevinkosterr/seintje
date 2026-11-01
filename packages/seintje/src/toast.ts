@@ -185,11 +185,11 @@ export class ToastView {
     this.element.append(this.card);
 
     const { pill, panel } = this.canvas;
-    panel.setAttribute("y", String(HEAD_HEIGHT));
     const px = (value: number) => `${value}px`;
     this.channels = {
       height: new Channel(0, (v) => {
         this.element.style.height = px(Math.max(0, v));
+        this.syncSpan();
       }),
       gap: new Channel(-STACK_GAP, (v) => {
         this.element.style.marginTop = px(v);
@@ -197,13 +197,13 @@ export class ToastView {
       swipe: new Channel(0, (v) => {
         this.card.style.transform = v === 0 ? "" : `translateY(${v}px)`;
       }),
+      // The description travels with the title, so their left edges stay lined up.
       headX: new Channel(0, (v) => {
         this.head.style.transform = `translateX(${v}px)`;
+        this.bodyInner.style.transform = `translateX(${v}px)`;
       }),
-      pillX: new Channel(0, (v) => pill.setAttribute("x", String(v))),
-      pillWidth: new Channel(HEAD_HEIGHT, (v) =>
-        pill.setAttribute("width", String(Math.max(0, v))),
-      ),
+      pillX: new Channel(0, () => this.syncSpan()),
+      pillWidth: new Channel(HEAD_HEIGHT, () => this.syncSpan()),
       pillHeight: new Channel(HEAD_HEIGHT, (v) =>
         pill.setAttribute("height", String(Math.max(0, v))),
       ),
@@ -213,6 +213,7 @@ export class ToastView {
         this.body.style.opacity = String(v);
       }),
     };
+    this.syncSpan();
 
     this.bindEvents();
     this.render(record, false);
@@ -478,6 +479,26 @@ export class ToastView {
     this.resizeObserver.observe(this.bodyInner);
   }
 
+  /**
+   * Keeps the pill, the panel under it and the body's clip on the same
+   * span, so the shape grows as one piece and the description never shows
+   * outside it or on top of the title.
+   */
+  private syncSpan(): void {
+    const { channels } = this;
+    if (!channels) return;
+    const x = channels.pillX.current;
+    const width = Math.max(0, channels.pillWidth.current);
+    const { pill, panel } = this.canvas;
+    for (const rect of [pill, panel]) {
+      rect.setAttribute("x", String(x));
+      rect.setAttribute("width", String(width));
+    }
+    const right = Math.max(0, TOAST_WIDTH - x - width);
+    const hidden = Math.max(0, this.bodyHeight - (channels.height.current - HEAD_HEIGHT));
+    this.body.style.clipPath = `inset(0 ${right}px ${hidden}px ${Math.max(0, x)}px)`;
+  }
+
   private layout(initial = false): void {
     if (!this.mounted) return;
     const { motion, align } = this.ctx;
@@ -510,16 +531,22 @@ export class ToastView {
     this.body.style.height = `${bodyHeight}px`;
 
     const shape = initial ? INSTANT : motion.spring(!open);
+    // Sideways movement never overshoots: the card's edges are hard limits.
+    const span = initial ? INSTANT : motion.spring(true);
     const { channels } = this;
-    channels.pillX.to(pillX, shape);
-    channels.headX.to(pillX, shape);
-    channels.pillWidth.to(pillWidth, shape);
+    channels.pillX.to(pillX, span);
+    channels.headX.to(pillX, span);
+    channels.pillWidth.to(pillWidth, span);
     channels.pillHeight.to(open ? HEAD_HEIGHT + radius : HEAD_HEIGHT, shape);
-    channels.panelHeight.to(open ? bodyHeight : 0, motion.spring(!open));
+    // The panel starts inside the pill's straight section. If it started at the
+    // pill's bottom edge, both shapes would round off at the same height and
+    // the outline would pinch in where they meet.
+    this.canvas.panel.setAttribute("y", String(HEAD_HEIGHT - radius));
+    channels.panelHeight.to(open ? bodyHeight + radius : 0, motion.spring(!open));
     channels.panelOpacity.to(open ? 1 : 0, motion.reduced ? INSTANT : open ? FADE_IN : FADE_OUT);
     channels.bodyOpacity.to(
       open ? 1 : 0,
-      open ? { ...FADE_IN, delay: opening && !motion.reduced ? 0.08 : 0 } : FADE_OUT,
+      open ? { ...FADE_IN, delay: opening && !motion.reduced ? 0.14 : 0 } : FADE_OUT,
     );
     if (!this.closing) {
       channels.height.to(open ? HEAD_HEIGHT + bodyHeight : HEAD_HEIGHT, motion.spring(!open));
