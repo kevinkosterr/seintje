@@ -54,7 +54,8 @@ bun run --filter playground-vue dev
 ```
 
 Releases are managed with [Changesets](https://github.com/changesets/changesets): run
-`bun changeset`, and the release workflow opens a version PR and publishes with `bun publish`.
+`bun changeset`, and the release workflow keeps a release PR up to date. Merging it publishes the
+changed packages to npm through trusted publishing and creates a GitHub release for each.
 
 ## Credits
 
