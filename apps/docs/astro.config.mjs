@@ -4,6 +4,9 @@ import vue from "@astrojs/vue";
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
+  // Served from GitHub Pages as a project site.
+  site: "https://kevinkosterr.github.io",
+  base: "/seintje",
   vite: {
     // Starlight's markdown processor loads a native binary; keep it out of the bundle.
     ssr: { external: ["satteri"] },
