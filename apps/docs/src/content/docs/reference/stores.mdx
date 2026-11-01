@@ -1,0 +1,56 @@
+---
+title: Stores and adapters
+description: Running separate toast stacks, and building your own adapter.
+---
+
+## Stores
+
+All state lives in a store. The `seintje` API and toasters use the default store unless you
+pass another one.
+
+```ts
+import { createApi, createStore, createToaster } from "seintje";
+
+const store = createStore();
+const editorToasts = createApi(store);
+createToaster("#editor", { store, position: "top-right" });
+
+editorToasts.info("Only in the editor");
+```
+
+A store has:
+
+| Member | Description |
+| --- | --- |
+| `getSnapshot()` | The current toasts, oldest first. A new array after every change. |
+| `subscribe(listener)` | Calls `listener` right away and after every change. Returns an unsubscribe function. This matches Svelte's store contract. |
+| `upsert(type, options)` | Adds a toast, or replaces the toast with the same id. |
+| `update(id, patch)` | Merges into an existing toast. |
+| `dismiss(id?)` | Marks toasts as closing and removes them after the exit animation. |
+| `remove(id)` and `clear(position?)` | Remove toasts immediately. |
+
+Each toast in a snapshot is a `ToastRecord`: `{ id, type, options, revision, createdAt, closing }`.
+`revision` goes up every time its content is replaced.
+
+## Writing an adapter
+
+The Vue and Svelte packages are small. They
+
+1. call `createToaster` when their component mounts, `update` when props change and `destroy` when it unmounts, and
+2. convert framework content into renderers with `adaptApi`.
+
+```ts
+import { adaptApi, seintje as core, type Content } from "seintje";
+
+type MyContent = string | MyWidget;
+
+const toContent = (content: MyContent | null | undefined): Content | null | undefined =>
+  typeof content === "object" && content !== null
+    ? (slot) => {
+        const mounted = content.mount(slot);
+        return () => mounted.unmount();
+      }
+    : content;
+
+export const seintje = adaptApi<MyContent>(core, toContent);
+```

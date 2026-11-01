@@ -1,0 +1,91 @@
+---
+title: Getting started
+description: Install Seintje and show your first toast.
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import Demo from "../../../components/Demo.astro";
+
+Seintje has one core package, `seintje`, that renders toasts with plain DOM. The Vue and Svelte
+packages wrap that core, so every toast looks and moves the same whichever you use.
+
+## Install
+
+<Tabs syncKey="framework">
+  <TabItem label="Vanilla">
+    ```sh
+    npm install seintje
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```sh
+    npm install @seintje/vue
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```sh
+    npm install @seintje/svelte
+    ```
+  </TabItem>
+</Tabs>
+
+## Mount a toaster and show a toast
+
+A toaster renders the toasts. Mount it once, then call `seintje` from anywhere.
+
+<Tabs syncKey="framework">
+  <TabItem label="Vanilla">
+    ```ts
+    import { createToaster, seintje } from "seintje";
+    import "seintje/styles.css";
+
+    createToaster(document.body, { position: "bottom-right" });
+
+    seintje.success({ title: "Saved", description: "Your changes are stored safely." });
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup lang="ts">
+    import { seintje, Toaster } from "@seintje/vue";
+    import "@seintje/vue/styles.css";
+    </script>
+
+    <template>
+      <button @click="seintje.success('Saved')">Save</button>
+      <Toaster position="bottom-right" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script lang="ts">
+      import { seintje, Toaster } from "@seintje/svelte";
+      import "@seintje/svelte/styles.css";
+    </script>
+
+    <button onclick={() => seintje.success("Saved")}>Save</button>
+    <Toaster position="bottom-right" />
+    ```
+  </TabItem>
+</Tabs>
+
+<Demo set="basics" />
+
+## How a toast behaves
+
+- A toast starts as a compact pill showing its icon and title.
+- If it has a description or an action, it opens into a full-width card shortly after it appears, then
+  closes again before it times out. Only the newest toast at a position opens on its own.
+- Hovering or focusing a toast opens it and pauses every timer of that toaster. The time that
+  was left is kept, not restarted.
+- Toasts can be dismissed by swiping them up or down, with their close button, or with
+  <kbd>Escape</kbd>.
+- Showing a toast with an `id` that is already on screen replaces its content in place.
+
+## Next steps
+
+- [Vanilla JavaScript](/guides/vanilla/), [Vue](/guides/vue/) or [Svelte](/guides/svelte/)
+  guides
+- [Every toast option](/reference/toast-options/)
+- [Theming](/guides/theming/) and [accessibility](/guides/accessibility/)

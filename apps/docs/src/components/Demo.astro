@@ -1,0 +1,88 @@
+---
+interface Props {
+  /** Which set of demo buttons to show. */
+  set?: "basics" | "positions" | "promise" | "options";
+}
+const { set = "basics" } = Astro.props;
+---
+
+<div class="seintje-demo not-content" data-demo-set={set}></div>
+
+<script>
+  import { POSITIONS, seintje, type Position } from "seintje";
+  import { ensureDocsToaster } from "./docs-toaster";
+
+  const toaster = ensureDocsToaster();
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const sets: Record<string, Record<string, () => unknown>> = {
+    basics: {
+      Success: () =>
+        seintje.success({ title: "Saved", description: "Your changes are stored safely." }),
+      Info: () => seintje.info({ title: "Tip", description: "Press Alt+T to jump to your toasts." }),
+      Warning: () =>
+        seintje.warning({ title: "Low on space", description: "Only 300 MB left on this device." }),
+      Error: () =>
+        seintje.error({ title: "Payment failed", description: "Your card was declined." }),
+      Neutral: () => seintje.show("Copied to clipboard"),
+    },
+    promise: {
+      "Resolve": () =>
+        seintje
+          .promise(wait(1600), {
+            loading: "Uploading",
+            success: { title: "Uploaded", description: "report.pdf is ready to share." },
+            error: "Upload failed",
+          })
+          .catch(() => {}),
+      "Reject": () =>
+        seintje
+          .promise(wait(1600).then(() => Promise.reject(new Error("Network unreachable"))), {
+            loading: "Uploading",
+            success: "Uploaded",
+            error: (err) => ({ title: "Upload failed", description: (err as Error).message }),
+          })
+          .catch(() => {}),
+    },
+    options: {
+      "With action": () =>
+        seintje.show({
+          type: "info",
+          title: "Conversation archived",
+          description: "You can find it under Archive.",
+          action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
+        }),
+      Persistent: () =>
+        seintje.warning({ title: "You are offline", description: "Changes will sync later.", duration: null }),
+      "Custom fill": () =>
+        seintje.success({
+          title: "Custom fill",
+          description: "Any colour works.",
+          fill: "#2b1d5c",
+        }),
+      "No auto-expand": () =>
+        seintje.info({ title: "Hover me", description: "I only open when you ask.", autoExpand: false }),
+      "Dismiss all": () => seintje.dismiss(),
+    },
+    positions: Object.fromEntries(
+      POSITIONS.map((position: Position) => [
+        position,
+        () => {
+          toaster.update({ position });
+          seintje.show({ title: position });
+        },
+      ]),
+    ),
+  };
+
+  for (const container of document.querySelectorAll<HTMLElement>("[data-demo-set]")) {
+    if (container.childElementCount) continue;
+    for (const [label, run] of Object.entries(sets[container.dataset.demoSet ?? "basics"] ?? {})) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", () => void run());
+      container.append(button);
+    }
+  }
+</script>

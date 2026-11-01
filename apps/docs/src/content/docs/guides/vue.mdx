@@ -1,0 +1,86 @@
+---
+title: Vue
+description: Use Seintje in Vue 3.4 and later.
+---
+
+import VueDemo from "../../../components/VueDemo.vue";
+
+`@seintje/vue` mounts the core toaster from a component and lets toasts hold VNodes and
+components. It needs Vue 3.4 or later.
+
+```sh
+npm install @seintje/vue
+```
+
+## The toaster
+
+Place `<Toaster>` once, usually in your root component. All of its props are reactive.
+
+```vue
+<script setup lang="ts">
+import { Toaster } from "@seintje/vue";
+import "@seintje/vue/styles.css";
+</script>
+
+<template>
+  <RouterView />
+  <Toaster position="top-right" theme="system" :offset="{ top: 72 }" />
+</template>
+```
+
+| Prop | Type |
+| --- | --- |
+| `position` | `Position` |
+| `theme` | `"light" \| "dark" \| "system"` |
+| `offset` | `number \| string \| { top?, right?, bottom?, left? }` |
+| `defaults` | toast options applied to every toast |
+| `motion` | `"system" \| "reduce" \| "full"` |
+| `store` | a store from `createStore()` |
+| `label` | accessible name of the region |
+| `hotkey` | `string \| false` |
+| `toaster-class` | class on the toaster root |
+
+See [toaster options](/reference/toaster/) for details.
+
+## Showing toasts
+
+Import `seintje` from `@seintje/vue`. It is the core API, extended so that `description` and
+`icon` also accept a VNode or a component.
+
+```ts
+import { seintje } from "@seintje/vue";
+import { h } from "vue";
+import InviteCard from "./InviteCard.vue";
+
+seintje.success("Saved");
+
+seintje.info({
+  title: "Render function",
+  description: h("span", ["Made with ", h("code", "h()")]),
+});
+
+seintje.show({ title: "Invite", description: InviteCard });
+```
+
+Content is rendered with your app's context, so components inside a toast can use plugins,
+`inject`, global components and directives.
+
+<VueDemo client:load />
+
+## Reading the toasts
+
+`useSeintje()` returns the API plus a read-only `toasts` ref with the current toasts.
+
+```vue
+<script setup lang="ts">
+import { useSeintje } from "@seintje/vue";
+
+const { toasts, dismiss } = useSeintje();
+</script>
+
+<template>
+  <button v-if="toasts.length" @click="dismiss()">Dismiss {{ toasts.length }}</button>
+</template>
+```
+
+Pass a store to `useSeintje(store)` to work with a store other than the default one.

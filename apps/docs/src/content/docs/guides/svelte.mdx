@@ -1,0 +1,80 @@
+---
+title: Svelte
+description: Use Seintje in Svelte 5.
+---
+
+import SvelteDemo from "../../../components/SvelteDemo.svelte";
+
+`@seintje/svelte` mounts the core toaster from a component and lets toasts hold snippets and
+components. It needs Svelte 5.
+
+```sh
+npm install @seintje/svelte
+```
+
+## The toaster
+
+Place `<Toaster>` once, for example in your root layout. All props are reactive.
+
+```svelte
+<script lang="ts">
+  import { Toaster } from "@seintje/svelte";
+  import "@seintje/svelte/styles.css";
+
+  let { children } = $props();
+</script>
+
+{@render children()}
+<Toaster position="top-right" theme="system" />
+```
+
+It takes the same props as the [toaster options](/reference/toaster/), with `class` for the
+root's class name.
+
+## Showing toasts
+
+Import `seintje` from `@seintje/svelte`. `description` and `icon` also accept a snippet, or a
+component with its props:
+
+```svelte
+<script lang="ts">
+  import { seintje } from "@seintje/svelte";
+  import Avatar from "./Avatar.svelte";
+</script>
+
+{#snippet details()}
+  Read the <a href="/changelog">changelog</a>.
+{/snippet}
+
+<button onclick={() => seintje.info({ title: "Updated", description: details })}>
+  Snippet
+</button>
+
+<button
+  onclick={() =>
+    seintje.show({ title: "New follower", icon: { component: Avatar, props: { id: 7 } } })}
+>
+  Component
+</button>
+```
+
+Components and snippets are mounted with the contexts that surround `<Toaster>`, so
+`getContext` works inside them.
+
+<SvelteDemo client:load />
+
+## Reading the toasts
+
+`toasts` is a readable store of the current toasts:
+
+```svelte
+<script lang="ts">
+  import { seintje, toasts } from "@seintje/svelte";
+</script>
+
+{#if $toasts.length}
+  <button onclick={() => seintje.dismiss()}>Dismiss {$toasts.length}</button>
+{/if}
+```
+
+For another store, use `toastsOf(store)`.
