@@ -2,18 +2,31 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
-permissions:
-  contents: write
-  pull-requests: write
-  id-token: write
-
 jobs:
-  release:
+  release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+    steps:
+      # Opens or updates the release PR. Tags and GitHub releases are only created
+      # once that PR is merged.
+      - id: release
+        uses: googleapis/release-please-action@v4
+
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.releases_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -24,15 +37,12 @@ jobs:
       # Trusted publishing needs npm 11.5.1 or newer.
       - run: npm install -g npm@latest
       - run: bun install --frozen-lockfile
-      - uses: changesets/action@v1
-        with:
-          version: bun run version
-          publish: bun run release
-          title: "build: release"
-          commit: "build: release"
-          createGithubReleases: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Only needed for the very first publish, before the packages exist on npm
-          # and trusted publishing can be configured. Delete the secret afterwards.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: bun run release
+
+  docs:
+    needs: publish
+    uses: ./.github/workflows/docs.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
