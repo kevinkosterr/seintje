@@ -24,6 +24,23 @@ const demos: Record<string, () => void> = {
       description: "You can find it under Archive.",
       action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
     }),
+  "action-only": () =>
+    seintje.show({
+      title: "Draft discarded",
+      action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
+    }),
+  "action-below": () =>
+    seintje.show({
+      title: "Draft discarded",
+      action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
+      actionPlacement: "below",
+    }),
+  "action-hover": () =>
+    seintje.show({
+      title: "Draft discarded",
+      action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
+      actionVisibility: "hover",
+    }),
   promise: () =>
     void seintje
       .promise(

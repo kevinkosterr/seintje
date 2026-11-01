@@ -102,7 +102,9 @@ export class ToastView {
   private readonly card: HTMLDivElement;
   private readonly canvas: GooeyCanvas;
   private readonly head: HTMLDivElement;
+  private readonly headRow: HTMLDivElement;
   private readonly headings: HTMLDivElement;
+  private readonly actions: HTMLDivElement;
   private readonly closeButton: HTMLButtonElement;
   private readonly body: HTMLDivElement;
   private readonly bodyInner: HTMLDivElement;
@@ -127,7 +129,10 @@ export class ToastView {
   };
 
   private headWidth = HEAD_HEIGHT;
+  /** Grows past `HEAD_HEIGHT` when the action sits under the title. */
+  private headHeight = HEAD_HEIGHT;
   private bodyHeight = MIN_BODY_HEIGHT;
+  private radius = DEFAULT_RADIUS;
   private wantsOpen = false;
   private active = true;
   private hovered = false;
@@ -163,13 +168,16 @@ export class ToastView {
     surface.append(this.canvas.svg);
 
     this.head = div(doc, "data-seintje-head");
+    this.headRow = div(doc, "data-seintje-head-row");
     this.headings = div(doc, "data-seintje-headings");
     this.closeButton = doc.createElement("button");
     this.closeButton.type = "button";
     this.closeButton.setAttribute("data-seintje-close", "");
     this.closeButton.setAttribute("aria-label", "Dismiss notification");
     this.closeButton.append(createCloseIcon());
-    this.head.append(this.headings, this.closeButton);
+    this.headRow.append(this.headings, this.closeButton);
+    this.actions = div(doc, "data-seintje-actions");
+    this.head.append(this.headRow, this.actions);
 
     this.body = div(doc, "data-seintje-body");
     this.bodyInner = div(doc, "data-seintje-body-inner");
@@ -178,7 +186,8 @@ export class ToastView {
     this.actionButton = doc.createElement("button");
     this.actionButton.type = "button";
     this.actionButton.setAttribute("data-seintje-action", "");
-    this.bodyInner.append(this.description, this.actionButton);
+    this.actions.append(this.actionButton);
+    this.bodyInner.append(this.description);
     this.body.append(this.bodyInner);
 
     this.card.append(surface, this.head, this.body);
@@ -253,11 +262,12 @@ export class ToastView {
     if (this.mounted) return;
     this.mounted = true;
     this.observe();
+    this.applyRadius();
     this.measure();
 
     const motion = this.ctx.motion;
     const fromY = this.ctx.grow === "down" ? -10 : 10;
-    this.channels.height.to(HEAD_HEIGHT, motion.spring());
+    this.channels.height.to(this.headHeight, motion.spring());
     this.channels.gap.to(0, motion.spring());
     if (motion.reduced) {
       animateElement(this.element, { opacity: [0, 1] }, FADE_IN);
@@ -337,7 +347,7 @@ export class ToastView {
   }
 
   private get hasBody(): boolean {
-    return hasContent(this.options.description) || Boolean(this.options.action);
+    return hasContent(this.options.description);
   }
 
   private flushPending(): void {
@@ -358,7 +368,7 @@ export class ToastView {
     this.element.setAttribute("aria-busy", type === "loading" ? "true" : "false");
     if (options.fill) this.element.style.setProperty("--seintje-fill", options.fill);
     else this.element.style.removeProperty("--seintje-fill");
-    this.canvas.setRadius(Math.max(0, options.radius ?? DEFAULT_RADIUS));
+    this.applyRadius();
     this.closeButton.hidden = !this.dismissible;
 
     this.renderHeading(type, this.titleText, options.icon, classes, animated);
@@ -381,6 +391,14 @@ export class ToastView {
     this.actionButton.textContent = action?.label ?? "";
     this.actionButton.className = classList(classes.action);
     this.actionButton.dataset.type = type;
+    const inline = options.actionPlacement !== "below";
+    this.actions.hidden = !action || inline;
+    setAttr(this.element, "data-action-visibility", action ? options.actionVisibility : undefined);
+    // Only move the button when the placement changes, so it keeps focus otherwise.
+    const parent = inline ? this.headRow : this.actions;
+    if (this.actionButton.parentElement !== parent) {
+      parent.insertBefore(this.actionButton, inline ? this.closeButton : null);
+    }
 
     if (this.mounted) {
       this.measure();
@@ -465,6 +483,8 @@ export class ToastView {
   private measure(): void {
     const width = this.head.offsetWidth;
     if (width > 0) this.headWidth = Math.min(TOAST_WIDTH, Math.max(HEAD_HEIGHT, width));
+    this.headHeight = Math.max(HEAD_HEIGHT, this.head.offsetHeight);
+    this.element.style.setProperty("--seintje-head-size", `${this.headHeight}px`);
     const height = this.bodyInner.offsetHeight;
     this.bodyHeight = Math.max(MIN_BODY_HEIGHT, height);
   }
@@ -495,8 +515,23 @@ export class ToastView {
       rect.setAttribute("width", String(width));
     }
     const right = Math.max(0, TOAST_WIDTH - x - width);
-    const hidden = Math.max(0, this.bodyHeight - (channels.height.current - HEAD_HEIGHT));
+    const hidden = Math.max(0, this.bodyHeight - (channels.height.current - this.headHeight));
     this.body.style.clipPath = `inset(0 ${right}px ${hidden}px ${Math.max(0, x)}px)`;
+  }
+
+  /**
+   * The `radius` option wins over `--seintje-radius`, which can only be read
+   * once the toast is in the document.
+   */
+  private applyRadius(): void {
+    let radius = this.options.radius;
+    if (radius === undefined && this.element.isConnected) {
+      const value = getComputedStyle(this.element).getPropertyValue("--seintje-radius");
+      const parsed = Number.parseFloat(value);
+      if (Number.isFinite(parsed)) radius = parsed;
+    }
+    this.radius = Math.max(0, radius ?? DEFAULT_RADIUS);
+    this.canvas.setRadius(this.radius);
   }
 
   private layout(initial = false): void {
@@ -515,7 +550,7 @@ export class ToastView {
     this.element.dataset.open = String(open);
     this.body.inert = !open;
 
-    const radius = Math.max(0, this.options.radius ?? DEFAULT_RADIUS);
+    const { radius } = this;
     // Collapsed, the pill hugs the header. Open, it spans the full card so the
     // title bar is as wide as the description below it.
     const restingX =
@@ -526,8 +561,8 @@ export class ToastView {
           : (TOAST_WIDTH - this.headWidth) / 2;
     const pillWidth = open ? TOAST_WIDTH : this.headWidth;
     const pillX = open ? 0 : restingX;
-    const bodyHeight = this.bodyHeight;
-    this.canvas.svg.setAttribute("height", String(HEAD_HEIGHT + bodyHeight));
+    const { bodyHeight, headHeight } = this;
+    this.canvas.svg.setAttribute("height", String(headHeight + bodyHeight));
     this.body.style.height = `${bodyHeight}px`;
 
     const shape = initial ? INSTANT : motion.spring(!open);
@@ -537,11 +572,11 @@ export class ToastView {
     channels.pillX.to(pillX, span);
     channels.headX.to(pillX, span);
     channels.pillWidth.to(pillWidth, span);
-    channels.pillHeight.to(open ? HEAD_HEIGHT + radius : HEAD_HEIGHT, shape);
+    channels.pillHeight.to(open ? headHeight + radius : headHeight, shape);
     // The panel starts inside the pill's straight section. If it started at the
     // pill's bottom edge, both shapes would round off at the same height and
     // the outline would pinch in where they meet.
-    this.canvas.panel.setAttribute("y", String(HEAD_HEIGHT - radius));
+    this.canvas.panel.setAttribute("y", String(headHeight - radius));
     channels.panelHeight.to(open ? bodyHeight + radius : 0, motion.spring(!open));
     channels.panelOpacity.to(open ? 1 : 0, motion.reduced ? INSTANT : open ? FADE_IN : FADE_OUT);
     channels.bodyOpacity.to(
@@ -549,7 +584,7 @@ export class ToastView {
       open ? { ...FADE_IN, delay: opening && !motion.reduced ? 0.14 : 0 } : FADE_OUT,
     );
     if (!this.closing) {
-      channels.height.to(open ? HEAD_HEIGHT + bodyHeight : HEAD_HEIGHT, motion.spring(!open));
+      channels.height.to(open ? headHeight + bodyHeight : headHeight, motion.spring(!open));
     }
   }
 

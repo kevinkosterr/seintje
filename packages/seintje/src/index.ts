@@ -16,6 +16,8 @@ export { createStore, type Listener, type Store, type StoreOptions } from "./sto
 export { DEFAULT_TITLES } from "./toast";
 export { createToaster, type Toaster, type ToasterOptions } from "./toaster";
 export {
+  type ActionPlacement,
+  type ActionVisibility,
   type AutoExpandOptions,
   type Content,
   type ContentRenderer,

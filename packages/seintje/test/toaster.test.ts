@@ -95,6 +95,27 @@ describe("rendering", () => {
     expect(host.querySelector("[data-seintje-title]")?.classList.contains("t")).toBe(true);
   });
 
+  test("reads the corner radius from the option or --seintje-radius", async () => {
+    const { api } = setup();
+    const radiusOf = async (options: Parameters<typeof api.show>[0]) => {
+      const id = api.show(options);
+      const rx = host.querySelector("[data-seintje-pill]")?.getAttribute("rx");
+      api.dismiss(id);
+      await flush(20);
+      return rx;
+    };
+    expect(await radiusOf({ title: "Default" })).toBe("18");
+    const style = document.createElement("style");
+    style.textContent = "[data-seintje-toast] { --seintje-radius: 8px; }";
+    document.head.append(style);
+    try {
+      expect(await radiusOf({ title: "Themed" })).toBe("8");
+      expect(await radiusOf({ title: "Own", radius: 4 })).toBe("4");
+    } finally {
+      style.remove();
+    }
+  });
+
   test("resolves the theme and offsets on the root", () => {
     const { root } = setup({ theme: "dark", offset: { top: 24, left: "2rem" } });
     expect(root.dataset.theme).toBe("dark");
@@ -226,6 +247,30 @@ describe("keyboard", () => {
     host.querySelectorAll<HTMLButtonElement>("[data-seintje-action]")[1]?.click();
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(store.getSnapshot().every((toast) => toast.closing)).toBe(true);
+  });
+
+  test("places the action next to the title by default, or under it", () => {
+    const { api } = setup();
+    api.show({ title: "a", action: { label: "Do", onClick: () => {} }, actionPlacement: "below" });
+    api.show({ title: "b", action: { label: "Do", onClick: () => {} } });
+    const [below, inline] = host.querySelectorAll<HTMLButtonElement>("[data-seintje-action]");
+    expect(below?.parentElement?.hasAttribute("data-seintje-actions")).toBe(true);
+    expect(below?.closest("[data-seintje-head]")).not.toBeNull();
+    expect(inline?.parentElement?.hasAttribute("data-seintje-head-row")).toBe(true);
+  });
+
+  test("an action without a description leaves no body to open", () => {
+    const { api } = setup();
+    api.show({ title: "x", action: { label: "Do", onClick: () => {} } });
+    const toast = toasts()[0] as HTMLElement;
+    toast.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    expect(toast.dataset.open).toBe("false");
+  });
+
+  test("marks hover-only actions", () => {
+    const { api } = setup();
+    api.show({ title: "x", action: { label: "Do", onClick: () => {} }, actionVisibility: "hover" });
+    expect(toasts()[0]?.getAttribute("data-action-visibility")).toBe("hover");
   });
 });
 

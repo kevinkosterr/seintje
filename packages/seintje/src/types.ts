@@ -37,6 +37,12 @@ export interface ToastAction {
   dismiss?: boolean;
 }
 
+/** Where the action button sits: next to the title, or under it. */
+export type ActionPlacement = "inline" | "below";
+
+/** Whether the action button is always shown, or only while the toast is hovered or focused. */
+export type ActionVisibility = "always" | "hover";
+
 export interface ToastClasses {
   toast?: string;
   title?: string;
@@ -64,13 +70,17 @@ export interface ToastOptions {
   /** Milliseconds before auto-dismissal. `null` or `Infinity` keeps it open. */
   duration?: number | null;
   action?: ToastAction;
+  /** Where the action button sits. Defaults to `"inline"`. */
+  actionPlacement?: ActionPlacement;
+  /** When the action button is shown. Defaults to `"always"`. */
+  actionVisibility?: ActionVisibility;
   /** Allow swipe, Escape and the close button. Defaults to `true`. */
   dismissible?: boolean;
   /** Open the description automatically. Defaults to `true`. */
   autoExpand?: boolean | AutoExpandOptions;
   /** Background colour of the toast shape. */
   fill?: string;
-  /** Corner radius in pixels. */
+  /** Corner radius in pixels. Defaults to `--seintje-radius`, else 18. */
   radius?: number;
   /** Announce through the assertive live region. Defaults to `true` for errors. */
   important?: boolean;

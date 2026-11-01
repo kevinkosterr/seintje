@@ -1,4 +1,6 @@
 export {
+  type ActionPlacement,
+  type ActionVisibility,
   createApi,
   createStore,
   defaultStore,
