@@ -13,13 +13,11 @@
     "typecheck": "bun run --filter seintje typecheck && bun run --filter @seintje/vue typecheck && bun run --filter @seintje/svelte typecheck",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "changeset": "changeset",
-    "release": "bun run build && bun scripts/publish.ts",
-    "version": "changeset version && bun install --lockfile-only"
+    "release": "bun run build && bun scripts/publish.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.4",
-    "@changesets/cli": "^3.0.3",
+    "@types/bun": "latest",
     "typescript": "^6.0.3"
   }
 }

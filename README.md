@@ -53,9 +53,10 @@ bun run build:docs     # static docs in apps/docs/dist
 bun run --filter playground-vue dev
 ```
 
-Releases are managed with [Changesets](https://github.com/changesets/changesets): run
-`bun changeset`, and the release workflow keeps a release PR up to date. Merging it publishes the
-changed packages to npm through trusted publishing and creates a GitHub release for each.
+Releases are managed with [release-please](https://github.com/googleapis/release-please): it reads
+the conventional commits on `master` and keeps a release PR up to date. Merging it creates a GitHub
+release for each changed package, publishes them to npm through trusted publishing and deploys the
+docs to GitHub Pages.
 
 ## Credits
 

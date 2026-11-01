@@ -2,8 +2,7 @@
  * Publishes every public package whose current version is not on npm yet.
  * `bun pm pack` rewrites `workspace:` ranges to real versions, and `npm publish`
  * uploads the tarball through npm trusted publishing (OIDC, no token needed).
- * Changesets then creates the git tags, which the release action turns into
- * GitHub releases.
+ * Tags and GitHub releases are created by release-please.
  */
 
 import { mkdtempSync, readdirSync } from "node:fs";
@@ -11,8 +10,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { $ } from "bun";
 
-const root = join(import.meta.dir, "..");
-const packagesDir = join(root, "packages");
+const packagesDir = join(import.meta.dir, "..", "packages");
 const outDir = mkdtempSync(join(tmpdir(), "seintje-publish-"));
 
 for (const dir of readdirSync(packagesDir)) {
@@ -36,5 +34,3 @@ for (const dir of readdirSync(packagesDir)) {
   const tarball = (await $`bun pm pack --destination ${outDir} --quiet`.cwd(cwd).text()).trim();
   await $`npm publish ${tarball} --access public`.cwd(cwd);
 }
-
-await $`bunx changeset tag`.cwd(root);

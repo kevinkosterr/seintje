@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!**/AGENTS.md", "!**/.changeset/*.md"]
+    "includes": ["**", "!**/AGENTS.md", "!**/CHANGELOG.md"]
   },
   "formatter": {
     "enabled": true,
