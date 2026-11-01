@@ -33,3 +33,6 @@ jobs:
           createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Only needed for the very first publish, before the packages exist on npm
+          # and trusted publishing can be configured. Delete the secret afterwards.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
