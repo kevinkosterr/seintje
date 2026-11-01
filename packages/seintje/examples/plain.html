@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seintje · plain HTML</title>
+    <!-- From a CDN: https://cdn.jsdelivr.net/npm/seintje/dist/styles.css -->
+    <link rel="stylesheet" href="../dist/styles.css" />
+  </head>
+  <body>
+    <button id="hello" type="button">Say hello</button>
+    <script type="module">
+      // From a CDN: https://cdn.jsdelivr.net/npm/seintje/dist/browser/seintje.js
+      import { createToaster, seintje } from "../dist/browser/seintje.js";
+
+      createToaster(document.body, { position: "top-center" });
+      document.getElementById("hello").addEventListener("click", () => {
+        seintje.success({ title: "Hello", description: "No framework, no bundler." });
+      });
+      window.seintje = seintje;
+    </script>
+  </body>
+</html>

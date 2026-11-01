@@ -1,0 +1,102 @@
+/** Visual and semantic flavour of a toast. */
+export type ToastType = "neutral" | "success" | "info" | "warning" | "error" | "loading";
+
+export const POSITIONS = [
+  "top-left",
+  "top-center",
+  "top-right",
+  "bottom-left",
+  "bottom-center",
+  "bottom-right",
+] as const;
+
+export type Position = (typeof POSITIONS)[number];
+
+/**
+ * Renders into a slot element owned by Seintje. May return a cleanup function
+ * that runs when the slot is emptied or the toast is removed.
+ */
+export type ContentRenderer = (slot: HTMLElement) => undefined | (() => void);
+
+/**
+ * Anything Seintje can put inside a toast: plain text, a DOM node, or a
+ * renderer. Framework adapters translate their own content (VNodes,
+ * snippets, components) into renderers.
+ */
+export type Content = string | Node | ContentRenderer;
+
+export interface ToastHandle {
+  id: string;
+  dismiss: () => void;
+}
+
+export interface ToastAction {
+  label: string;
+  onClick: (event: MouseEvent, toast: ToastHandle) => void;
+  /** Dismiss the toast after the click handler ran. Defaults to `false`. */
+  dismiss?: boolean;
+}
+
+export interface ToastClasses {
+  toast?: string;
+  title?: string;
+  description?: string;
+  icon?: string;
+  action?: string;
+}
+
+export interface AutoExpandOptions {
+  /** Milliseconds after the toast appears before it opens. */
+  delay?: number;
+  /** Milliseconds the toast stays open before it closes again. */
+  hold?: number;
+}
+
+export interface ToastOptions {
+  /** Reusing an id updates that toast in place instead of adding a new one. */
+  id?: string;
+  title?: string;
+  description?: Content;
+  type?: ToastType;
+  /** Replaces the type icon. `null` hides the icon. */
+  icon?: Content | null;
+  position?: Position;
+  /** Milliseconds before auto-dismissal. `null` or `Infinity` keeps it open. */
+  duration?: number | null;
+  action?: ToastAction;
+  /** Allow swipe, Escape and the close button. Defaults to `true`. */
+  dismissible?: boolean;
+  /** Open the description automatically. Defaults to `true`. */
+  autoExpand?: boolean | AutoExpandOptions;
+  /** Background colour of the toast shape. */
+  fill?: string;
+  /** Corner radius in pixels. */
+  radius?: number;
+  /** Announce through the assertive live region. Defaults to `true` for errors. */
+  important?: boolean;
+  className?: string;
+  classes?: ToastClasses;
+  onDismiss?: (id: string) => void;
+}
+
+/** A toast as it lives in the store. */
+export interface ToastRecord {
+  readonly id: string;
+  readonly type: ToastType;
+  readonly options: Readonly<ToastOptions>;
+  /** Increases every time the toast's content is replaced. */
+  readonly revision: number;
+  readonly createdAt: number;
+  /** Set once the toast has been dismissed and is animating out. */
+  readonly closing: boolean;
+}
+
+export type Theme = "light" | "dark" | "system";
+
+/** `system` follows `prefers-reduced-motion`. */
+export type MotionPreference = "system" | "reduce" | "full";
+
+export type OffsetValue = number | string;
+export type Offset =
+  | OffsetValue
+  | Partial<Record<"top" | "right" | "bottom" | "left", OffsetValue>>;

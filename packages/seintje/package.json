@@ -1,0 +1,53 @@
+{
+  "name": "seintje",
+  "version": "0.0.0",
+  "description": "Framework-agnostic toast notifications",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./browser": "./dist/browser/seintje.js",
+    "./package.json": "./package.json"
+  },
+  "keywords": [
+    "toast",
+    "notification",
+    "vanilla",
+    "motion",
+    "spring"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinkosterr/seintje.git",
+    "directory": "packages/seintje"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lucide": "^1.66.0",
+    "motion": "^14.9.0"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.4",
+    "@types/bun": "^1.4.4",
+    "tsdown": "^0.23.4",
+    "typescript": "^6.0.3"
+  }
+}
