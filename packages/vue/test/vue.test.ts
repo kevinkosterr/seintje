@@ -67,6 +67,16 @@ describe("<Toaster>", () => {
     expect(document.querySelector(".badge")?.textContent).toBe("from app");
   });
 
+  test("renders components and inline SVG markup as icons", async () => {
+    const Star = defineComponent({ setup: () => () => h("svg", { class: "star" }) });
+    render(Toaster, { props: { motion: "reduce" } });
+    seintje.info({ title: "Component", icon: Star });
+    seintje.info({ title: "Svg", icon: '<svg viewBox="0 0 24 24"><circle r="4"/></svg>' });
+    await nextTick();
+    expect(document.querySelector("[data-seintje-icon] .star")).not.toBeNull();
+    expect(document.querySelector("[data-seintje-icon] svg circle")).not.toBeNull();
+  });
+
   test("unmounts rendered content when the toast is removed", async () => {
     const unmounted = vi.fn();
     const Content = defineComponent({

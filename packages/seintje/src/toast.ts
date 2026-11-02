@@ -21,7 +21,7 @@ import {
 } from "./constants";
 import { hasContent, mountContent } from "./content";
 import { createGooeyCanvas, type GooeyCanvas } from "./gooey";
-import { createCloseIcon, createIcon } from "./icons";
+import { createCloseIcon, createIcon, isSvgMarkup, parseSvg } from "./icons";
 import type { Content, ToastOptions, ToastRecord, ToastType } from "./types";
 
 export type Align = "start" | "center" | "end";
@@ -434,7 +434,10 @@ export class ToastView {
       iconSlot.className = classList(classes.icon);
       iconSlot.setAttribute("aria-hidden", "true");
       if (icon === undefined) iconSlot.append(createIcon(type));
-      else cleanup = mountContent(iconSlot, icon);
+      else if (typeof icon === "string" && isSvgMarkup(icon)) {
+        const svg = parseSvg(doc, icon);
+        if (svg) iconSlot.append(svg);
+      } else cleanup = mountContent(iconSlot, icon);
       node.append(iconSlot);
     }
     const titleNode = doc.createElement("span");

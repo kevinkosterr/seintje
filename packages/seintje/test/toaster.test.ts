@@ -360,6 +360,32 @@ describe("expanding", () => {
     expect(drawn).toEqual(["circle", "path"]);
   });
 
+  test("renders inline SVG markup as the icon", () => {
+    const { api } = setup();
+    api.show({ title: "Svg", icon: '<svg viewBox="0 0 24 24"><path d="M1 1h2"/></svg>' });
+    const svg = host.querySelector("[data-seintje-icon] svg");
+    expect(svg?.namespaceURI).toBe("http://www.w3.org/2000/svg");
+    expect(svg?.querySelector("path")?.getAttribute("d")).toBe("M1 1h2");
+  });
+
+  test("strips scripts and event handlers from inline SVG", () => {
+    const { api } = setup();
+    api.show({
+      title: "Svg",
+      icon: '<svg onload="alert(1)"><a href="javascript:x"><path/></a><script>alert(2)</script></svg>',
+    });
+    const svg = host.querySelector("[data-seintje-icon] svg");
+    expect(svg?.hasAttribute("onload")).toBe(false);
+    expect(svg?.querySelector("script")).toBeNull();
+    expect(svg?.querySelector("a")?.hasAttribute("href")).toBe(false);
+  });
+
+  test("keeps other text icons as text", () => {
+    const { api } = setup();
+    api.show({ title: "Emoji", icon: "🚀" });
+    expect(host.querySelector("[data-seintje-icon]")?.textContent).toBe("🚀");
+  });
+
   test("loading toasts never open", async () => {
     const { api } = setup({ defaults: { autoExpand: { delay: 0 } } });
     api.loading({ title: "Busy", description: "hidden" });

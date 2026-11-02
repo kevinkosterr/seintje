@@ -67,3 +67,30 @@ export function createIcon(type: ToastType): SVGElement {
 
 /** Small cross used by the dismiss button. */
 export const createCloseIcon = (): SVGElement => draw(CLOSE, 14);
+
+/** True when `value` is SVG markup rather than plain text. */
+export const isSvgMarkup = (value: string): boolean => /^\s*<svg[\s>]/i.test(value);
+
+/**
+ * Parses inline SVG markup into an element. Scripts, foreign objects and
+ * event handler attributes are stripped. Returns `null` for invalid markup.
+ */
+export function parseSvg(doc: Document, markup: string): SVGElement | null {
+  // Template content is inert, and the HTML parser does not require `xmlns`.
+  const template = doc.createElement("template");
+  template.innerHTML = markup.trim();
+  const root = template.content.firstElementChild;
+  if (!root || root.namespaceURI !== SVG_NS || root.localName !== "svg") return null;
+
+  for (const unsafe of root.querySelectorAll("script, foreignObject")) unsafe.remove();
+  for (const element of [root, ...root.querySelectorAll("*")]) {
+    for (const { name, value } of [...element.attributes]) {
+      const isHandler = name.toLowerCase().startsWith("on");
+      const isScriptLink = /href$/i.test(name) && /^\s*javascript:/i.test(value);
+      if (isHandler || isScriptLink) element.removeAttribute(name);
+    }
+  }
+  root.setAttribute("aria-hidden", "true");
+  root.setAttribute("focusable", "false");
+  return doc.importNode(root, true) as SVGElement;
+}

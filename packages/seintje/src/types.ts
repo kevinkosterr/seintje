@@ -64,7 +64,10 @@ export interface ToastOptions {
   title?: string;
   description?: Content;
   type?: ToastType;
-  /** Replaces the type icon. `null` hides the icon. */
+  /**
+   * Replaces the type icon. A string starting with `<svg` is rendered as
+   * inline SVG markup. `null` hides the icon.
+   */
   icon?: Content | null;
   position?: Position;
   /** Milliseconds before auto-dismissal. `null` or `Infinity` keeps it open. */
