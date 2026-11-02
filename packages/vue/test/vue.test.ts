@@ -77,6 +77,16 @@ describe("<Toaster>", () => {
     expect(document.querySelector("[data-seintje-icon] svg circle")).not.toBeNull();
   });
 
+  test("converts content in the types prop", async () => {
+    const Cloud = defineComponent({ setup: () => () => h("svg", { class: "cloud" }) });
+    render(Toaster, { props: { motion: "reduce", types: { upload: { icon: Cloud } } } });
+    seintje.custom("upload", "Uploading");
+    await nextTick();
+    expect(
+      document.querySelector('[data-type="upload"] [data-seintje-icon] .cloud'),
+    ).not.toBeNull();
+  });
+
   test("unmounts rendered content when the toast is removed", async () => {
     const unmounted = vi.fn();
     const Content = defineComponent({

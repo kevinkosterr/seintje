@@ -10,7 +10,7 @@ import {
   type ToasterOptions,
 } from "seintje";
 import { getCurrentInstance, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { toCoreOptions, type VueToastOptions } from "./api";
+import { toCoreOptions, toCoreTypes, type VueToastOptions, type VueToastTypeOptions } from "./api";
 import { setAppContext } from "./content";
 
 const props = withDefaults(
@@ -19,6 +19,7 @@ const props = withDefaults(
     theme?: Theme;
     offset?: Offset;
     defaults?: Partial<VueToastOptions>;
+    types?: Record<string, VueToastTypeOptions>;
     motion?: MotionPreference;
     store?: Store;
     label?: string;
@@ -39,6 +40,7 @@ const options = (): ToasterOptions => {
   if (props.theme !== undefined) result.theme = props.theme;
   if (props.offset !== undefined) result.offset = props.offset;
   if (props.defaults !== undefined) result.defaults = toCoreOptions(props.defaults);
+  if (props.types !== undefined) result.types = toCoreTypes(props.types);
   if (props.motion !== undefined) result.motion = props.motion;
   if (props.store !== undefined) result.store = props.store;
   if (props.label !== undefined) result.label = props.label;
