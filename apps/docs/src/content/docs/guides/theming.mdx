@@ -105,6 +105,32 @@ seintje.success({
 The Vue and Svelte packages also take a component, so icon libraries like `@lucide/vue` or
 `@lucide/svelte` work directly: `icon: Rocket`.
 
+## Custom types
+
+Besides the built-in types you can show toasts of any type you name with `seintje.custom()`. Give
+the type its defaults in the toaster's `types` option, and its tone in CSS:
+
+```ts
+createToaster(document.body, {
+  types: {
+    upload: { title: "Uploading", icon: "<svg …>", duration: null },
+  },
+});
+
+const id = seintje.custom("upload", { description: "photo.jpg" });
+seintje.update(id, { type: "success", title: "Uploaded", duration: 4000 });
+```
+
+```css
+[data-seintje-toast][data-type="upload"] {
+  --seintje-tone: #c4a1ff;
+}
+```
+
+A toast's own options win over its type's, which win over `defaults`. Without any of them, a
+custom type has the `neutral` icon, title and tone. `types` also accepts the built-in types, for
+example to give every `error` toast a longer `duration`.
+
 ## Per toast
 
 `fill` changes the background of a single toast, and `radius` its corner radius:
