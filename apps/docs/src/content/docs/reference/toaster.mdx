@@ -30,6 +30,7 @@ The returned toaster has:
 | `store` | `Store` | default store | The store to render. Fixed after creation. |
 | `label` | `string` | `"Notifications"` | Accessible name of the toaster. |
 | `hotkey` | `string \| false` | `"Alt+T"` | Moves focus to the newest toast. Modifiers: `Alt`, `Ctrl`, `Shift`, `Meta`. |
+| `limit` | `number` | `5` | Most toasts shown at once per position. A new toast past the limit dismisses the oldest. `Infinity` removes the limit. |
 | `className` | `string` | — | Class on the toaster root. |
 
 Render one toaster per store. Two toasters on the same store would both draw every toast.

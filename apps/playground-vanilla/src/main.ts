@@ -88,5 +88,8 @@ select("theme").addEventListener("change", (e) =>
 select("motion").addEventListener("change", (e) =>
   toaster.update({ motion: (e.target as HTMLSelectElement).value as MotionPreference }),
 );
+select("limit").addEventListener("change", (e) =>
+  toaster.update({ limit: Number((e.target as HTMLSelectElement).value) }),
+);
 
 Object.assign(window, { seintje, toaster });

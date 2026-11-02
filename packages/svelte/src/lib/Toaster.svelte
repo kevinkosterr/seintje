@@ -28,6 +28,7 @@ interface Props {
   store?: Store;
   label?: string;
   hotkey?: string | false;
+  limit?: number;
   class?: string;
 }
 
@@ -49,6 +50,7 @@ const options = (): ToasterOptions => {
   if (props.store !== undefined) result.store = props.store;
   if (props.label !== undefined) result.label = props.label;
   if (props.hotkey !== undefined) result.hotkey = props.hotkey;
+  if (props.limit !== undefined) result.limit = props.limit;
   if (props.class !== undefined) result.className = props.class;
   return result;
 };

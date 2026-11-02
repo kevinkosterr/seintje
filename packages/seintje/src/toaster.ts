@@ -1,5 +1,5 @@
 import { MotionSettings } from "./animation";
-import { TOAST_WIDTH } from "./constants";
+import { DEFAULT_LIMIT, TOAST_WIDTH } from "./constants";
 import { defaultStore } from "./default";
 import type { Store } from "./store";
 import { watchTheme } from "./theme";
@@ -38,6 +38,11 @@ export interface ToasterOptions {
   label?: string;
   /** Shortcut that moves focus to the newest toast. Defaults to `Alt+T`; `false` disables it. */
   hotkey?: string | false;
+  /**
+   * Most toasts shown at once per position. Adding one more dismisses the
+   * oldest. Defaults to `5`; `Infinity` removes the limit.
+   */
+  limit?: number;
   className?: string;
 }
 
@@ -306,6 +311,22 @@ export function createToaster(
 
   /* --------------------------------------------------------------- Sync */
 
+  const enforceLimit = (records: readonly ToastRecord[]) => {
+    const limit = Math.max(1, options.limit ?? DEFAULT_LIMIT);
+    const open = new Map<Position, string[]>();
+    for (const record of records) {
+      if (record.closing) continue;
+      const pos = record.options.position ?? position();
+      const ids = open.get(pos) ?? [];
+      ids.push(record.id);
+      open.set(pos, ids);
+    }
+    // Records are oldest first, so the excess sits at the front.
+    for (const ids of open.values()) {
+      for (const id of ids.slice(0, Math.max(0, ids.length - limit))) store.dismiss(id);
+    }
+  };
+
   const updateActive = () => {
     const records = store.getSnapshot();
     const activeByPosition = new Map<Position, ToastView>();
@@ -371,6 +392,7 @@ export function createToaster(
     pruneViewports();
     syncPause();
     updateActive();
+    enforceLimit(records);
   };
 
   /* ------------------------------------------------------------- Events */
