@@ -22,3 +22,9 @@ export const SWAP_MS = 240;
 
 export const SWIPE_DISMISS_DISTANCE = 40;
 export const SWIPE_MAX_TRAVEL = 64;
+/** Distance a touch travels before the swipe commits to an axis. */
+export const SWIPE_AXIS_LOCK = 8;
+/** Horizontal distance that dismisses a touch swipe on release. */
+export const SWIPE_X_DISMISS_DISTANCE = 80;
+/** Horizontal speed, in pixels per millisecond, that counts as a flick. */
+export const SWIPE_X_FLICK_VELOCITY = 0.4;

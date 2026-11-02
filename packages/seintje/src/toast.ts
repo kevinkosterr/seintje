@@ -15,14 +15,17 @@ import {
   MIN_BODY_HEIGHT,
   STACK_GAP,
   SWAP_MS,
+  SWIPE_AXIS_LOCK,
   SWIPE_DISMISS_DISTANCE,
   SWIPE_MAX_TRAVEL,
+  SWIPE_X_DISMISS_DISTANCE,
+  SWIPE_X_FLICK_VELOCITY,
   TOAST_WIDTH,
 } from "./constants";
 import { hasContent, mountContent } from "./content";
 import { createGooeyCanvas, type GooeyCanvas } from "./gooey";
 import { createCloseIcon, createIcon, isSvgMarkup, parseSvg } from "./icons";
-import type { Content, ToastOptions, ToastRecord, ToastType } from "./types";
+import type { BuiltInToastType, Content, ToastOptions, ToastRecord, ToastType } from "./types";
 
 export type Align = "start" | "center" | "end";
 export type Grow = "down" | "up";
@@ -32,14 +35,15 @@ export interface ToastContext {
   motion: MotionSettings;
   align: Align;
   grow: Grow;
-  /** Toaster-wide defaults, merged under each toast's own options. */
-  defaults: () => Partial<ToastOptions>;
+  /** Toaster defaults for a type, merged under each toast's own options. */
+  defaults: (type: ToastType) => Partial<ToastOptions>;
   dismiss: (view: ToastView, via: "pointer" | "keyboard" | "swipe") => void;
   /** Reports pointer or focus entering (`true`) or leaving (`false`) the toast. */
   interact: (view: ToastView, engaged: boolean) => void;
 }
 
-export const DEFAULT_TITLES: Record<ToastType, string> = {
+/** Title per built-in type. Custom types fall back to the neutral title. */
+export const DEFAULT_TITLES: Record<BuiltInToastType, string> = {
   neutral: "Notification",
   success: "Success",
   info: "Info",
@@ -119,6 +123,7 @@ export class ToastView {
     height: Channel;
     gap: Channel;
     swipe: Channel;
+    swipeX: Channel;
     headX: Channel;
     pillX: Channel;
     pillWidth: Channel;
@@ -146,14 +151,16 @@ export class ToastView {
   private openTimer: ReturnType<typeof setTimeout> | undefined;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
   private resizeObserver: ResizeObserver | undefined;
-  private swipeStart: number | undefined;
+  private swipeStart: { x: number; y: number; time: number } | undefined;
+  /** Mouse and pen swipes are vertical only; touch picks an axis once it moves far enough. */
+  private swipeAxis: "x" | "y" | undefined;
   private swipeDirection = 0;
 
   constructor(record: ToastRecord, ctx: ToastContext) {
     const { doc } = ctx;
     this.ctx = ctx;
     this.record = record;
-    this.options = resolveOptions(record, ctx.defaults());
+    this.options = resolveOptions(record, ctx.defaults(record.type));
 
     this.element = doc.createElement("li");
     this.element.setAttribute("data-seintje-toast", "");
@@ -203,9 +210,8 @@ export class ToastView {
       gap: new Channel(-STACK_GAP, (v) => {
         this.element.style.marginTop = px(v);
       }),
-      swipe: new Channel(0, (v) => {
-        this.card.style.transform = v === 0 ? "" : `translateY(${v}px)`;
-      }),
+      swipe: new Channel(0, () => this.syncSwipe()),
+      swipeX: new Channel(0, () => this.syncSwipe()),
       // The description travels with the title, so their left edges stay lined up.
       headX: new Channel(0, (v) => {
         this.head.style.transform = `translateX(${v}px)`;
@@ -340,10 +346,23 @@ export class ToastView {
     this.element.remove();
   }
 
+  private syncSwipe(): void {
+    // Called while the channels are still being created.
+    if (!this.channels) return;
+    const x = this.channels.swipeX.current;
+    const y = this.channels.swipe.current;
+    this.card.style.transform = x === 0 && y === 0 ? "" : `translate(${x}px, ${y}px)`;
+    this.card.style.opacity = x === 0 ? "" : String(Math.max(0, 1 - Math.abs(x) / TOAST_WIDTH));
+  }
+
   /* --------------------------------------------------------------- Render */
 
   private get titleText(): string {
-    return this.options.title || DEFAULT_TITLES[this.record.type];
+    const { type } = this.record;
+    const fallback = Object.hasOwn(DEFAULT_TITLES, type)
+      ? DEFAULT_TITLES[type as BuiltInToastType]
+      : DEFAULT_TITLES.neutral;
+    return this.options.title || fallback;
   }
 
   private get hasBody(): boolean {
@@ -358,7 +377,7 @@ export class ToastView {
 
   private render(record: ToastRecord, animated: boolean): void {
     this.record = record;
-    this.options = resolveOptions(record, this.ctx.defaults());
+    this.options = resolveOptions(record, this.ctx.defaults(record.type));
     const { options } = this;
     const type = record.type;
     const classes = options.classes ?? {};
@@ -647,8 +666,13 @@ export class ToastView {
     if (motion.reduced) {
       animateElement(this.element, { opacity: 0 }, FADE_OUT);
     } else {
-      const drift = this.swipeDirection || (this.ctx.grow === "down" ? -1 : 1);
-      this.channels.swipe.to(this.channels.swipe.current + drift * 16, flat);
+      if (this.swipeAxis === "x") {
+        const { swipeX } = this.channels;
+        swipeX.to(swipeX.current + this.swipeDirection * TOAST_WIDTH * 0.5, flat);
+      } else {
+        const drift = this.swipeDirection || (this.ctx.grow === "down" ? -1 : 1);
+        this.channels.swipe.to(this.channels.swipe.current + drift * 16, flat);
+      }
       animateElement(this.element, { opacity: 0, scale: 0.94 }, flat);
     }
     // Set after the animation starts so focus can move away first.
@@ -726,31 +750,55 @@ export class ToastView {
   private onPointerDown(event: PointerEvent): void {
     if (!this.dismissible || this.closing || event.button !== 0) return;
     if ((event.target as Element | null)?.closest("button")) return;
-    this.swipeStart = event.clientY;
+    this.swipeStart = { x: event.clientX, y: event.clientY, time: event.timeStamp };
+    this.swipeAxis = event.pointerType === "touch" ? undefined : "y";
     this.element.setPointerCapture?.(event.pointerId);
     this.element.dataset.swiping = "";
   }
 
   private onPointerMove(event: PointerEvent): void {
     if (this.swipeStart === undefined) return;
-    const delta = event.clientY - this.swipeStart;
+    const dx = event.clientX - this.swipeStart.x;
+    const dy = event.clientY - this.swipeStart.y;
+    if (!this.swipeAxis) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_AXIS_LOCK) return;
+      this.swipeAxis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+    }
+    if (this.swipeAxis === "x") {
+      // Sideways follows the finger, so the toast can be thrown off screen.
+      this.channels.swipeX.set(dx);
+      return;
+    }
     // Rubber band: easy to start, harder the further it travels.
-    const travel = SWIPE_MAX_TRAVEL * (1 - Math.exp(-Math.abs(delta) / SWIPE_MAX_TRAVEL));
-    this.channels.swipe.set(Math.sign(delta) * travel);
+    const travel = SWIPE_MAX_TRAVEL * (1 - Math.exp(-Math.abs(dy) / SWIPE_MAX_TRAVEL));
+    this.channels.swipe.set(Math.sign(dy) * travel);
   }
 
   private onPointerUp(event: PointerEvent, cancelled = false): void {
     if (this.swipeStart === undefined) return;
-    const delta = event.clientY - this.swipeStart;
+    const start = this.swipeStart;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
     this.swipeStart = undefined;
     delete this.element.dataset.swiping;
     this.element.releasePointerCapture?.(event.pointerId);
 
-    if (!cancelled && Math.abs(delta) >= SWIPE_DISMISS_DISTANCE) {
-      this.swipeDirection = Math.sign(delta);
+    if (!cancelled && this.swipeAxis === "x") {
+      const velocity = Math.abs(dx) / Math.max(1, event.timeStamp - start.time);
+      const flicked = velocity >= SWIPE_X_FLICK_VELOCITY && Math.abs(dx) >= SWIPE_AXIS_LOCK * 2;
+      if (Math.abs(dx) >= SWIPE_X_DISMISS_DISTANCE || flicked) {
+        this.swipeDirection = Math.sign(dx);
+        this.ctx.dismiss(this, "swipe");
+        return;
+      }
+    } else if (!cancelled && this.swipeAxis === "y" && Math.abs(dy) >= SWIPE_DISMISS_DISTANCE) {
+      this.swipeDirection = Math.sign(dy);
       this.ctx.dismiss(this, "swipe");
       return;
     }
-    this.channels.swipe.to(0, this.ctx.motion.spring());
+    this.swipeAxis = undefined;
+    const spring = this.ctx.motion.spring();
+    this.channels.swipe.to(0, spring);
+    this.channels.swipeX.to(0, spring);
   }
 }

@@ -3,8 +3,10 @@ export {
   type AdaptedPromiseOptions,
   type AdaptedToastInput,
   type AdaptedToastOptions,
+  type AdaptedToastTypeOptions,
   adaptApi,
   adaptOptions,
+  adaptTypes,
   type ContentConverter,
 } from "./adapter";
 export { SPRING, SPRING_FLAT } from "./animation";
@@ -19,6 +21,7 @@ export {
   type ActionPlacement,
   type ActionVisibility,
   type AutoExpandOptions,
+  type BuiltInToastType,
   type Content,
   type ContentRenderer,
   type MotionPreference,
@@ -33,4 +36,5 @@ export {
   type ToastOptions,
   type ToastRecord,
   type ToastType,
+  type ToastTypeOptions,
 } from "./types";

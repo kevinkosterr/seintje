@@ -1,5 +1,12 @@
-/** Visual and semantic flavour of a toast. */
-export type ToastType = "neutral" | "success" | "info" | "warning" | "error" | "loading";
+/** Toast types Seintje ships with an icon, title and colour for. */
+export type BuiltInToastType = "neutral" | "success" | "info" | "warning" | "error" | "loading";
+
+/**
+ * Visual and semantic flavour of a toast. Any other string is a custom type:
+ * it looks like `neutral` until the toaster's `types` option or CSS on
+ * `[data-type="…"]` says otherwise.
+ */
+export type ToastType = BuiltInToastType | (string & {});
 
 export const POSITIONS = [
   "top-left",
@@ -91,6 +98,9 @@ export interface ToastOptions {
   classes?: ToastClasses;
   onDismiss?: (id: string) => void;
 }
+
+/** Defaults for every toast of one type. A toast's own options win. */
+export type ToastTypeOptions = Omit<ToastOptions, "id" | "type">;
 
 /** A toast as it lives in the store. */
 export interface ToastRecord {

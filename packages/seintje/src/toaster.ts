@@ -12,6 +12,8 @@ import type {
   Theme,
   ToastOptions,
   ToastRecord,
+  ToastType,
+  ToastTypeOptions,
 } from "./types";
 
 export interface ToasterOptions {
@@ -23,6 +25,11 @@ export interface ToasterOptions {
   offset?: Offset;
   /** Options applied to every toast unless it sets its own. */
   defaults?: Partial<ToastOptions>;
+  /**
+   * Options per toast type, such as an icon and title for a custom `"upload"`
+   * type. They apply over `defaults` and under the toast's own options.
+   */
+  types?: Record<string, ToastTypeOptions>;
   /** `system` follows `prefers-reduced-motion`. Defaults to `system`. */
   motion?: MotionPreference;
   /** The store to render. Defaults to the store behind the `seintje` API. */
@@ -280,7 +287,11 @@ export function createToaster(
     motion,
     align: alignOf(pos),
     grow: growOf(pos),
-    defaults: () => options.defaults ?? {},
+    defaults: (type: ToastType): Partial<ToastOptions> => {
+      const base = options.defaults ?? {};
+      const own = options.types && Object.hasOwn(options.types, type) ? options.types[type] : {};
+      return { ...base, ...own, classes: { ...base.classes, ...own?.classes } };
+    },
     dismiss: (view: ToastView, via: "pointer" | "keyboard" | "swipe") => {
       if (via === "keyboard" && view.element.contains(doc.activeElement)) {
         const next = focusTarget(view);
@@ -424,7 +435,7 @@ export function createToaster(
       store.defaultPosition = position();
       motion.setPreference(options.motion ?? "system");
       applyAppearance();
-      if (previous.defaults !== options.defaults) {
+      if (previous.defaults !== options.defaults || previous.types !== options.types) {
         for (const { view } of views.values()) view.refresh();
       }
       sync(store.getSnapshot());

@@ -312,6 +312,40 @@ describe("timers", () => {
   });
 });
 
+describe("swiping", () => {
+  const swipe = (toast: HTMLElement, pointerType: string, dx: number, dy = 0) => {
+    const head = toast.querySelector("[data-seintje-head]") as HTMLElement;
+    const init = { bubbles: true, button: 0, pointerId: 1, pointerType };
+    head.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientX: 0, clientY: 0 }));
+    head.dispatchEvent(
+      new PointerEvent("pointermove", { ...init, clientX: dx / 2, clientY: dy / 2 }),
+    );
+    head.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: dx, clientY: dy }));
+    head.dispatchEvent(new PointerEvent("pointerup", { ...init, clientX: dx, clientY: dy }));
+  };
+
+  test("a sideways touch swipe dismisses", () => {
+    const { api, store } = setup();
+    api.show({ title: "Swipe me", duration: null });
+    swipe(toasts()[0] as HTMLElement, "touch", 120);
+    expect(store.getSnapshot()[0]?.closing).toBe(true);
+  });
+
+  test("a sideways mouse drag does not dismiss", () => {
+    const { api, store } = setup();
+    api.show({ title: "Drag me", duration: null });
+    swipe(toasts()[0] as HTMLElement, "mouse", 120);
+    expect(store.getSnapshot()[0]?.closing).toBe(false);
+  });
+
+  test("a vertical touch swipe still dismisses", () => {
+    const { api, store } = setup();
+    api.show({ title: "Swipe me", duration: null });
+    swipe(toasts()[0] as HTMLElement, "touch", 0, -60);
+    expect(store.getSnapshot()[0]?.closing).toBe(true);
+  });
+});
+
 describe("expanding", () => {
   test("opens automatically, and only the newest toast", async () => {
     const { api } = setup({ defaults: { autoExpand: { delay: 0 } } });
@@ -472,5 +506,58 @@ describe("limit", () => {
     const { api, store } = setup({ limit: Infinity });
     for (let i = 1; i <= 8; i++) api.show({ title: `Toast ${i}`, duration: null });
     expect(open(store)).toHaveLength(8);
+  });
+});
+
+describe("custom types", () => {
+  test("look neutral until configured", () => {
+    const { api } = setup();
+    api.custom("upload", { description: "photo.jpg" });
+    const [toast] = toasts();
+    expect(toast?.dataset.type).toBe("upload");
+    expect(toast?.querySelector("[data-seintje-title]")?.textContent).toBe("Notification");
+    expect(toast?.querySelector("[data-seintje-icon] svg")).not.toBeNull();
+  });
+
+  test("take their defaults from the toaster's types", () => {
+    const { api } = setup({
+      defaults: { fill: "black", classes: { toast: "base" } },
+      types: {
+        upload: { title: "Uploading", icon: "⇡", fill: "navy", classes: { title: "upload-title" } },
+      },
+    });
+    api.custom("upload", {});
+    api.custom("upload", { title: "Photo uploaded", fill: "green" });
+    const [first, second] = toasts();
+    expect(first?.querySelector("[data-seintje-title]")?.textContent).toBe("Uploading");
+    expect(first?.querySelector("[data-seintje-icon]")?.textContent).toBe("⇡");
+    expect(first?.style.getPropertyValue("--seintje-fill")).toBe("navy");
+    expect(first?.className).toBe("base");
+    expect(first?.querySelector("[data-seintje-title]")?.className).toBe("upload-title");
+    expect(second?.querySelector("[data-seintje-title]")?.textContent).toBe("Photo uploaded");
+    expect(second?.style.getPropertyValue("--seintje-fill")).toBe("green");
+  });
+
+  test("can change the built-in types too", () => {
+    const { api } = setup({ types: { success: { title: "Nice" } } });
+    api.success({});
+    api.info({});
+    expect(
+      toasts().map((toast) => toast.querySelector("[data-seintje-title]")?.textContent),
+    ).toEqual(["Nice", "Info"]);
+  });
+
+  test("apply their duration", async () => {
+    const { api, store } = setup({ types: { flash: { duration: 20 } } });
+    api.custom("flash", "Quick");
+    await flush(30);
+    expect(store.getSnapshot()[0]?.closing).toBe(true);
+  });
+
+  test("re-render when the toaster's types change", () => {
+    const { api } = setup();
+    api.custom("upload", {});
+    toaster?.update({ types: { upload: { title: "Uploading" } } });
+    expect(host.querySelector("[data-seintje-title]")?.textContent).toBe("Uploading");
   });
 });
