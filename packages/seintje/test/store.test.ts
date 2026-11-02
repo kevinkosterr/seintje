@@ -81,6 +81,16 @@ describe("api", () => {
     expect(api.store.getSnapshot().map((toast) => toast.type)).toEqual(["neutral", "warning"]);
   });
 
+  test("custom shows a toast of the given type", () => {
+    const api = createApi();
+    api.custom("upload", "Uploading");
+    expect(api.store.getSnapshot()[0]).toMatchObject({
+      type: "upload",
+      options: { title: "Uploading" },
+    });
+    expect(() => api.custom("", "Nameless")).toThrow();
+  });
+
   test("loading toasts never time out by default", () => {
     const api = createApi();
     api.loading("Please wait");

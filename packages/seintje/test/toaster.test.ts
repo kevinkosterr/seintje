@@ -434,3 +434,56 @@ describe("reduced motion", () => {
     expect(toasts()[0]?.style.height).toBe(`${HEAD_HEIGHT}px`);
   });
 });
+
+describe("custom types", () => {
+  test("look neutral until configured", () => {
+    const { api } = setup();
+    api.custom("upload", { description: "photo.jpg" });
+    const [toast] = toasts();
+    expect(toast?.dataset.type).toBe("upload");
+    expect(toast?.querySelector("[data-seintje-title]")?.textContent).toBe("Notification");
+    expect(toast?.querySelector("[data-seintje-icon] svg")).not.toBeNull();
+  });
+
+  test("take their defaults from the toaster's types", () => {
+    const { api } = setup({
+      defaults: { fill: "black", classes: { toast: "base" } },
+      types: {
+        upload: { title: "Uploading", icon: "⇡", fill: "navy", classes: { title: "upload-title" } },
+      },
+    });
+    api.custom("upload", {});
+    api.custom("upload", { title: "Photo uploaded", fill: "green" });
+    const [first, second] = toasts();
+    expect(first?.querySelector("[data-seintje-title]")?.textContent).toBe("Uploading");
+    expect(first?.querySelector("[data-seintje-icon]")?.textContent).toBe("⇡");
+    expect(first?.style.getPropertyValue("--seintje-fill")).toBe("navy");
+    expect(first?.className).toBe("base");
+    expect(first?.querySelector("[data-seintje-title]")?.className).toBe("upload-title");
+    expect(second?.querySelector("[data-seintje-title]")?.textContent).toBe("Photo uploaded");
+    expect(second?.style.getPropertyValue("--seintje-fill")).toBe("green");
+  });
+
+  test("can change the built-in types too", () => {
+    const { api } = setup({ types: { success: { title: "Nice" } } });
+    api.success({});
+    api.info({});
+    expect(
+      toasts().map((toast) => toast.querySelector("[data-seintje-title]")?.textContent),
+    ).toEqual(["Nice", "Info"]);
+  });
+
+  test("apply their duration", async () => {
+    const { api, store } = setup({ types: { flash: { duration: 20 } } });
+    api.custom("flash", "Quick");
+    await flush(30);
+    expect(store.getSnapshot()[0]?.closing).toBe(true);
+  });
+
+  test("re-render when the toaster's types change", () => {
+    const { api } = setup();
+    api.custom("upload", {});
+    toaster?.update({ types: { upload: { title: "Uploading" } } });
+    expect(host.querySelector("[data-seintje-title]")?.textContent).toBe("Uploading");
+  });
+});

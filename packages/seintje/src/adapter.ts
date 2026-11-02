@@ -1,6 +1,6 @@
 import type { SeintjeApi } from "./api";
 import type { Store } from "./store";
-import type { Content, Position, ToastOptions } from "./types";
+import type { Content, Position, ToastOptions, ToastType, ToastTypeOptions } from "./types";
 
 /* Helpers for framework adapters that accept their own kind of content. */
 
@@ -9,6 +9,9 @@ export interface AdaptedToastOptions<C> extends Omit<ToastOptions, "description"
   description?: C;
   icon?: C | null;
 }
+
+/** Per-type toaster options whose content is a framework type `C`. */
+export type AdaptedToastTypeOptions<C> = Omit<AdaptedToastOptions<C>, "id" | "type">;
 
 export type AdaptedToastInput<C> = string | AdaptedToastOptions<C>;
 
@@ -28,6 +31,7 @@ export interface AdaptedApi<C> {
   warning(input: AdaptedToastInput<C>): string;
   error(input: AdaptedToastInput<C>): string;
   loading(input: AdaptedToastInput<C>): string;
+  custom(type: ToastType, input: AdaptedToastInput<C>): string;
   promise<T>(
     promise: Promise<T> | (() => Promise<T>),
     options: AdaptedPromiseOptions<C, T>,
@@ -52,6 +56,16 @@ export function adaptOptions<C>(
   return adapted;
 }
 
+/** Converts framework content in a toaster's `types` option into core content. */
+export function adaptTypes<C>(
+  types: Record<string, AdaptedToastTypeOptions<C>>,
+  convert: ContentConverter<C>,
+): Record<string, ToastTypeOptions> {
+  return Object.fromEntries(
+    Object.entries(types).map(([type, options]) => [type, adaptOptions(options, convert)]),
+  );
+}
+
 /** Wraps a core API so every method accepts framework content. */
 export function adaptApi<C>(api: SeintjeApi, convert: ContentConverter<C>): AdaptedApi<C> {
   const input = (value: AdaptedToastInput<C>) =>
@@ -69,6 +83,7 @@ export function adaptApi<C>(api: SeintjeApi, convert: ContentConverter<C>): Adap
     warning: (value) => api.warning(input(value)),
     error: (value) => api.error(input(value)),
     loading: (value) => api.loading(input(value)),
+    custom: (type, value) => api.custom(type, input(value)),
     promise: (promise, options) =>
       api.promise(promise, {
         loading: input(options.loading),

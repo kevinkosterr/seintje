@@ -1,4 +1,4 @@
-import type { ToastType } from "./types";
+import type { BuiltInToastType, ToastType } from "./types";
 
 /*!
  * The icons below are from Lucide (https://lucide.dev): bell, circle-check,
@@ -53,7 +53,7 @@ type IconNode = ReadonlyArray<readonly [tag: string, attrs: Readonly<Record<stri
 const circle = ["circle", { cx: "12", cy: "12", r: "10" }] as const;
 
 /** Icon per toast type. */
-const ICONS: Record<ToastType, IconNode> = {
+const ICONS: Record<BuiltInToastType, IconNode> = {
   neutral: [
     ["path", { d: "M10.268 21a2 2 0 0 0 3.464 0" }],
     [
@@ -102,8 +102,10 @@ const draw = (node: IconNode, size: number): SVGElement => {
   return svg;
 };
 
+/** Draws the icon of a built-in type. Custom types get the neutral icon. */
 export function createIcon(type: ToastType): SVGElement {
-  const svg = draw(ICONS[type], 18);
+  const node = Object.hasOwn(ICONS, type) ? ICONS[type as BuiltInToastType] : ICONS.neutral;
+  const svg = draw(node, 18);
   if (type === "loading") svg.setAttribute("data-seintje-spin", "");
   return svg;
 }
