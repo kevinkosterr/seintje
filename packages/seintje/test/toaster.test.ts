@@ -312,6 +312,40 @@ describe("timers", () => {
   });
 });
 
+describe("swiping", () => {
+  const swipe = (toast: HTMLElement, pointerType: string, dx: number, dy = 0) => {
+    const head = toast.querySelector("[data-seintje-head]") as HTMLElement;
+    const init = { bubbles: true, button: 0, pointerId: 1, pointerType };
+    head.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientX: 0, clientY: 0 }));
+    head.dispatchEvent(
+      new PointerEvent("pointermove", { ...init, clientX: dx / 2, clientY: dy / 2 }),
+    );
+    head.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: dx, clientY: dy }));
+    head.dispatchEvent(new PointerEvent("pointerup", { ...init, clientX: dx, clientY: dy }));
+  };
+
+  test("a sideways touch swipe dismisses", () => {
+    const { api, store } = setup();
+    api.show({ title: "Swipe me", duration: null });
+    swipe(toasts()[0] as HTMLElement, "touch", 120);
+    expect(store.getSnapshot()[0]?.closing).toBe(true);
+  });
+
+  test("a sideways mouse drag does not dismiss", () => {
+    const { api, store } = setup();
+    api.show({ title: "Drag me", duration: null });
+    swipe(toasts()[0] as HTMLElement, "mouse", 120);
+    expect(store.getSnapshot()[0]?.closing).toBe(false);
+  });
+
+  test("a vertical touch swipe still dismisses", () => {
+    const { api, store } = setup();
+    api.show({ title: "Swipe me", duration: null });
+    swipe(toasts()[0] as HTMLElement, "touch", 0, -60);
+    expect(store.getSnapshot()[0]?.closing).toBe(true);
+  });
+});
+
 describe("expanding", () => {
   test("opens automatically, and only the newest toast", async () => {
     const { api } = setup({ defaults: { autoExpand: { delay: 0 } } });
