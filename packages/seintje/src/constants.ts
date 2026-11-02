@@ -10,6 +10,8 @@ export const HEAD_INSET = 6;
 export const STACK_GAP = 10;
 
 export const DEFAULT_DURATION = 5000;
+/** Toasts shown per position before the oldest is dismissed. */
+export const DEFAULT_LIMIT = 5;
 /** How long a dismissed toast stays in the store while it animates out. */
 export const EXIT_MS = 450;
 export const AUTO_OPEN_DELAY = 220;

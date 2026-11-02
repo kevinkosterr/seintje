@@ -434,3 +434,43 @@ describe("reduced motion", () => {
     expect(toasts()[0]?.style.height).toBe(`${HEAD_HEIGHT}px`);
   });
 });
+
+describe("limit", () => {
+  const open = (store: ReturnType<typeof createStore>) =>
+    store
+      .getSnapshot()
+      .filter((toast) => !toast.closing)
+      .map((toast) => toast.options.title);
+
+  test("dismisses the oldest toast past five by default", () => {
+    const { api, store } = setup();
+    for (let i = 1; i <= 6; i++) api.show({ title: `Toast ${i}`, duration: null });
+    expect(open(store)).toEqual(["Toast 2", "Toast 3", "Toast 4", "Toast 5", "Toast 6"]);
+  });
+
+  test("can be configured", () => {
+    const { api, store } = setup({ limit: 2 });
+    for (let i = 1; i <= 4; i++) api.show({ title: `Toast ${i}`, duration: null });
+    expect(open(store)).toEqual(["Toast 3", "Toast 4"]);
+  });
+
+  test("counts each position on its own", () => {
+    const { api, store } = setup({ limit: 1 });
+    api.show({ title: "Corner", duration: null });
+    api.show({ title: "Top", position: "top-center", duration: null });
+    expect(open(store)).toEqual(["Corner", "Top"]);
+  });
+
+  test("applies a lowered limit on update", () => {
+    const { api, store } = setup();
+    for (let i = 1; i <= 3; i++) api.show({ title: `Toast ${i}`, duration: null });
+    toaster?.update({ limit: 1 });
+    expect(open(store)).toEqual(["Toast 3"]);
+  });
+
+  test("Infinity removes the limit", () => {
+    const { api, store } = setup({ limit: Infinity });
+    for (let i = 1; i <= 8; i++) api.show({ title: `Toast ${i}`, duration: null });
+    expect(open(store)).toHaveLength(8);
+  });
+});
