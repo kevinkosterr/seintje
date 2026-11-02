@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.1](https://github.com/kevinkosterr/seintje/compare/vue-v0.1.0...vue-v0.1.1) (2026-11-02)
+
+
+### Features
+
+* **seintje:** accept inline svg markup as toast icon ([183b6fb](https://github.com/kevinkosterr/seintje/commit/183b6fb50d5ec70d6847e48ba7b3d422e315a6e7))
+* **vue:** accept custom toast types ([727d21e](https://github.com/kevinkosterr/seintje/commit/727d21e5cf7257a4315d2192ea24155e82da6357))
+* **vue:** add limit prop to toaster ([ddddf6d](https://github.com/kevinkosterr/seintje/commit/ddddf6dad9e15c8b0f3115ad01b232051d5b0402))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * seintje bumped to 0.1.1
+
 ## 0.1.0 (2026-11-01)
 
 

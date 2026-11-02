@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.1](https://github.com/kevinkosterr/seintje/compare/seintje-v0.1.0...seintje-v0.1.1) (2026-11-02)
+
+
+### Features
+
+* **seintje:** accept inline svg markup as toast icon ([183b6fb](https://github.com/kevinkosterr/seintje/commit/183b6fb50d5ec70d6847e48ba7b3d422e315a6e7))
+* **seintje:** add configurable toast limit per position ([8be5935](https://github.com/kevinkosterr/seintje/commit/8be593548cfb06d9048f83f5dc47168d594f9a2e))
+* **seintje:** add custom toast types ([bcd399d](https://github.com/kevinkosterr/seintje/commit/bcd399d61019c46938dab2fd2e977c40c61b180d))
+* **seintje:** dismiss toasts with a sideways touch swipe ([d3aeee2](https://github.com/kevinkosterr/seintje/commit/d3aeee2584b498e8a022b66cabe1641c427eab90))
+* **seintje:** dismiss toasts with a sideways touch swipe ([52604d9](https://github.com/kevinkosterr/seintje/commit/52604d95f23eed574299cfc59b75e1c12db39dbc))
+
 ## 0.1.0 (2026-11-01)
 
 
