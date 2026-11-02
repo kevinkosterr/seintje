@@ -57,6 +57,18 @@ describe("<Toaster>", () => {
     expect(document.querySelector(".badge")?.textContent).toBe("from app!");
   });
 
+  test("renders bare components as icons", () => {
+    render(WithContext);
+    seintje.info({ title: "Component", icon: ReadsContext });
+    expect(document.querySelector("[data-seintje-icon] .badge")?.textContent).toBe("from app");
+  });
+
+  test("renders inline SVG markup as icons", () => {
+    render(Toaster, { motion: "reduce" });
+    seintje.info({ title: "Svg", icon: '<svg viewBox="0 0 24 24"><circle r="4"/></svg>' });
+    expect(document.querySelector("[data-seintje-icon] svg circle")).not.toBeNull();
+  });
+
   test("unmounts rendered content when the toast is removed", async () => {
     const store = createStore({ exitDuration: 5 });
     const api = createSvelteApi(createApi(store));
