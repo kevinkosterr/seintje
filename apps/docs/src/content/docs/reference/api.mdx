@@ -21,6 +21,16 @@ Show a toast of that type.
 
 Shows a spinner. Loading toasts never time out unless you pass a `duration`, and never open.
 
+## `seintje.custom(type, input)`
+
+Shows a toast of a type you name, such as `"upload"`. A custom type looks like `neutral` until you
+give it defaults through the toaster's [`types`](../toaster/) option, or a tone in CSS through
+`[data-type="upload"]`. See [custom types](../../guides/theming/#custom-types).
+
+```ts
+seintje.custom("upload", { title: "Uploading", description: "photo.jpg" });
+```
+
 ## `seintje.promise(promise, options)`
 
 Shows a loading toast, then turns it into a success or error toast when the promise settles.
@@ -72,5 +82,5 @@ Besides the functions and types, `seintje` exports the values it uses as default
 | `HEAD_HEIGHT` | `44`, height of the collapsed pill in pixels |
 | `TOAST_WIDTH` | `356`, width of a toast in pixels |
 | `POSITIONS` | the six positions, `top-left` to `bottom-right` |
-| `DEFAULT_TITLES` | the title of each type when a toast has none |
+| `DEFAULT_TITLES` | the title of each built-in type when a toast has none. Custom types use the `neutral` title |
 | `SPRING`, `SPRING_FLAT` | the springs of the open and close animations, in [Motion](https://motion.dev) format |

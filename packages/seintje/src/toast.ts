@@ -25,7 +25,7 @@ import {
 import { hasContent, mountContent } from "./content";
 import { createGooeyCanvas, type GooeyCanvas } from "./gooey";
 import { createCloseIcon, createIcon, isSvgMarkup, parseSvg } from "./icons";
-import type { Content, ToastOptions, ToastRecord, ToastType } from "./types";
+import type { BuiltInToastType, Content, ToastOptions, ToastRecord, ToastType } from "./types";
 
 export type Align = "start" | "center" | "end";
 export type Grow = "down" | "up";
@@ -35,14 +35,15 @@ export interface ToastContext {
   motion: MotionSettings;
   align: Align;
   grow: Grow;
-  /** Toaster-wide defaults, merged under each toast's own options. */
-  defaults: () => Partial<ToastOptions>;
+  /** Toaster defaults for a type, merged under each toast's own options. */
+  defaults: (type: ToastType) => Partial<ToastOptions>;
   dismiss: (view: ToastView, via: "pointer" | "keyboard" | "swipe") => void;
   /** Reports pointer or focus entering (`true`) or leaving (`false`) the toast. */
   interact: (view: ToastView, engaged: boolean) => void;
 }
 
-export const DEFAULT_TITLES: Record<ToastType, string> = {
+/** Title per built-in type. Custom types fall back to the neutral title. */
+export const DEFAULT_TITLES: Record<BuiltInToastType, string> = {
   neutral: "Notification",
   success: "Success",
   info: "Info",
@@ -159,7 +160,7 @@ export class ToastView {
     const { doc } = ctx;
     this.ctx = ctx;
     this.record = record;
-    this.options = resolveOptions(record, ctx.defaults());
+    this.options = resolveOptions(record, ctx.defaults(record.type));
 
     this.element = doc.createElement("li");
     this.element.setAttribute("data-seintje-toast", "");
@@ -357,7 +358,11 @@ export class ToastView {
   /* --------------------------------------------------------------- Render */
 
   private get titleText(): string {
-    return this.options.title || DEFAULT_TITLES[this.record.type];
+    const { type } = this.record;
+    const fallback = Object.hasOwn(DEFAULT_TITLES, type)
+      ? DEFAULT_TITLES[type as BuiltInToastType]
+      : DEFAULT_TITLES.neutral;
+    return this.options.title || fallback;
   }
 
   private get hasBody(): boolean {
@@ -372,7 +377,7 @@ export class ToastView {
 
   private render(record: ToastRecord, animated: boolean): void {
     this.record = record;
-    this.options = resolveOptions(record, this.ctx.defaults());
+    this.options = resolveOptions(record, this.ctx.defaults(record.type));
     const { options } = this;
     const type = record.type;
     const classes = options.classes ?? {};

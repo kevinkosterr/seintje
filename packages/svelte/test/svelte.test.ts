@@ -69,6 +69,14 @@ describe("<Toaster>", () => {
     expect(document.querySelector("[data-seintje-icon] svg circle")).not.toBeNull();
   });
 
+  test("converts content in the types prop", () => {
+    render(Toaster, { motion: "reduce", types: { upload: { icon: ReadsContext } } });
+    seintje.custom("upload", "Uploading");
+    expect(
+      document.querySelector('[data-type="upload"] [data-seintje-icon] .badge'),
+    ).not.toBeNull();
+  });
+
   test("unmounts rendered content when the toast is removed", async () => {
     const store = createStore({ exitDuration: 5 });
     const api = createSvelteApi(createApi(store));

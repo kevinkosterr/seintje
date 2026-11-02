@@ -25,6 +25,7 @@ The returned toaster has:
 | `theme` | `"light" \| "dark" \| "system"` | `"system"` | Colour scheme. |
 | `offset` | `number \| string \| { top?, right?, bottom?, left? }` | `16px` | Distance from the viewport edges. Numbers are pixels. |
 | `defaults` | `Partial<ToastOptions>` | — | Applied under every toast's own options. |
+| `types` | `Record<string, ToastTypeOptions>` | — | Options per toast type, applied over `defaults` and under the toast's own options. Works for [custom types](../../guides/theming/#custom-types) and the built-in ones. |
 | `motion` | `"system" \| "reduce" \| "full"` | `"system"` | Whether to reduce motion. |
 | `store` | `Store` | default store | The store to render. Fixed after creation. |
 | `label` | `string` | `"Notifications"` | Accessible name of the toaster. |

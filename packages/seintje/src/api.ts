@@ -24,6 +24,11 @@ export interface SeintjeApi {
   /** Shows a spinner that stays until it is updated or dismissed. */
   loading(input: ToastInput): string;
   /**
+   * Shows a toast of a custom type, such as `"upload"`. Its defaults come from
+   * the toaster's `types` option, and it can be styled through `[data-type]`.
+   */
+  custom(type: ToastType, input: ToastInput): string;
+  /**
    * Shows a loading toast that turns into a success or error toast once the
    * promise settles. Resolves or rejects with the original outcome.
    */
@@ -55,6 +60,10 @@ export function createApi(store: Store = createStore()): SeintjeApi {
     warning: typed("warning"),
     error: typed("error"),
     loading: (input) => store.upsert("loading", { duration: null, ...normalize(input) }),
+    custom: (type, input) => {
+      if (!type) throw new Error("seintje: custom() needs a type");
+      return store.upsert(type, normalize(input));
+    },
 
     promise(promise, { loading, success, error, shared }) {
       const id = store.upsert("loading", { ...shared, duration: null, ...normalize(loading) });
