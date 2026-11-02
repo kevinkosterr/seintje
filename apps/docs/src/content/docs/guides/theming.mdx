@@ -89,15 +89,21 @@ in script.
 
 ## Icons
 
-Each type has a [Lucide](https://lucide.dev) icon: `bell`, `circle-check`, `info`,
-`triangle-alert`, `circle-x` and `loader-circle`. Replace one with the `icon` option, which takes
-any content, for example another Lucide icon:
+Each type has a built-in icon, adapted from [Lucide](https://lucide.dev): `bell`, `circle-check`,
+`info`, `triangle-alert`, `circle-x` and `loader-circle`. Replace one with the `icon` option, which
+takes any content. A string that starts with `<svg` is rendered as inline SVG, with scripts and
+event handlers removed:
 
 ```ts
-import { createElement, Rocket } from "lucide";
-
-seintje.success({ title: "Launched", icon: createElement(Rocket, { width: 18, height: 18 }) });
+seintje.success({
+  title: "Launched",
+  icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2"><path d="M12 2 2 22h20Z" /></svg>`,
+});
 ```
+
+The Vue and Svelte packages also take a component, so icon libraries like `@lucide/vue` or
+`@lucide/svelte` work directly: `icon: Rocket`.
 
 ## Per toast
 

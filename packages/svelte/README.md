@@ -26,8 +26,8 @@ npm install @seintje/svelte
 <Toaster position="top-right" />
 ```
 
-- `description` and `icon` accept text, snippets and `{ component, props }`. They are mounted
-  with the contexts around `<Toaster>`.
+- `description` and `icon` accept text, snippets, components and `{ component, props }`; `icon`
+  also accepts inline SVG markup. They are mounted with the contexts around `<Toaster>`.
 - `toasts` is a readable store of the current toasts; `toastsOf(store)` wraps any store.
 
 MIT licensed.
