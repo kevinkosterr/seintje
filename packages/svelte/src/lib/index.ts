@@ -14,6 +14,7 @@ export {
   type ToastClasses,
   type ToastRecord,
   type ToastType,
+  type ToastTypeOptions,
 } from "seintje";
 export {
   createSvelteApi,
@@ -21,8 +22,10 @@ export {
   type SvelteSeintjeApi,
   type SvelteToastInput,
   type SvelteToastOptions,
+  type SvelteToastTypeOptions,
   seintje,
   toCoreOptions,
+  toCoreTypes,
 } from "./api.js";
 export { type ComponentContent, type SvelteContent, setContexts, toContent } from "./content.js";
 export { toasts, toastsOf } from "./stores.js";

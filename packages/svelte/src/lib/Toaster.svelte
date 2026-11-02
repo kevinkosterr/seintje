@@ -10,7 +10,12 @@ import {
   type ToasterOptions,
 } from "seintje";
 import { getAllContexts, untrack } from "svelte";
-import { type SvelteToastOptions, toCoreOptions } from "./api.js";
+import {
+  type SvelteToastOptions,
+  type SvelteToastTypeOptions,
+  toCoreOptions,
+  toCoreTypes,
+} from "./api.js";
 import { setContexts } from "./content.js";
 
 interface Props {
@@ -18,6 +23,7 @@ interface Props {
   theme?: Theme;
   offset?: Offset;
   defaults?: Partial<SvelteToastOptions>;
+  types?: Record<string, SvelteToastTypeOptions>;
   motion?: MotionPreference;
   store?: Store;
   label?: string;
@@ -38,6 +44,7 @@ const options = (): ToasterOptions => {
   if (props.theme !== undefined) result.theme = props.theme;
   if (props.offset !== undefined) result.offset = props.offset;
   if (props.defaults !== undefined) result.defaults = toCoreOptions(props.defaults);
+  if (props.types !== undefined) result.types = toCoreTypes(props.types);
   if (props.motion !== undefined) result.motion = props.motion;
   if (props.store !== undefined) result.store = props.store;
   if (props.label !== undefined) result.label = props.label;
