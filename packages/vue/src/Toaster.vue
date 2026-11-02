@@ -23,6 +23,7 @@ const props = withDefaults(
     store?: Store;
     label?: string;
     hotkey?: string | false;
+    limit?: number;
     toasterClass?: string;
   }>(),
   // An explicit default stops Vue from casting a missing `hotkey` to `false`.
@@ -43,6 +44,7 @@ const options = (): ToasterOptions => {
   if (props.store !== undefined) result.store = props.store;
   if (props.label !== undefined) result.label = props.label;
   if (props.hotkey !== undefined) result.hotkey = props.hotkey;
+  if (props.limit !== undefined) result.limit = props.limit;
   if (props.toasterClass !== undefined) result.className = props.toasterClass;
   return result;
 };
