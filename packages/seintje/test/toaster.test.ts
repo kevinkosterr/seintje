@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import { CircleCheck } from "lucide";
 import { createApi } from "../src/api";
 import { HEAD_HEIGHT, TOAST_WIDTH } from "../src/constants";
 import { createStore } from "../src/store";
@@ -351,14 +350,14 @@ describe("expanding", () => {
     expect(panel?.getAttribute("width")).toBe(pill?.getAttribute("width"));
   });
 
-  test("uses Lucide icons", () => {
+  test("draws a built-in icon per type", () => {
     const { api } = setup();
     api.success("Done");
-    const drawn = [...(host.querySelector("[data-seintje-icon] svg")?.children ?? [])].map(
-      (child) => [child.tagName.toLowerCase(), child.getAttribute("d") ?? child.getAttribute("r")],
-    );
-    const expected = CircleCheck.map(([tag, attrs]) => [tag, String(attrs.d ?? attrs.r)]);
-    expect(drawn).toEqual(expected);
+    const svg = host.querySelector("[data-seintje-icon] svg");
+    expect(svg?.namespaceURI).toBe("http://www.w3.org/2000/svg");
+    expect(svg?.getAttribute("viewBox")).toBe("0 0 24 24");
+    const drawn = [...(svg?.children ?? [])].map((child) => child.tagName.toLowerCase());
+    expect(drawn).toEqual(["circle", "path"]);
   });
 
   test("loading toasts never open", async () => {

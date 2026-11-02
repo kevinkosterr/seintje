@@ -9,7 +9,7 @@ export default defineConfig([
     dts: true,
     sourcemap: true,
     clean: true,
-    external: ["motion", "lucide"],
+    external: ["motion"],
     hooks: {
       "build:done": () => {
         mkdirSync("dist", { recursive: true });
@@ -18,7 +18,7 @@ export default defineConfig([
     },
   },
   {
-    // Self-contained build for <script type="module"> and CDNs; bundles motion and lucide.
+    // Self-contained build for <script type="module"> and CDNs; bundles motion.
     entry: { seintje: "src/index.ts" },
     outDir: "dist/browser",
     format: "esm",
@@ -27,6 +27,6 @@ export default defineConfig([
     minify: true,
     sourcemap: true,
     clean: false,
-    noExternal: ["motion", "lucide"],
+    noExternal: ["motion"],
   },
 ]);

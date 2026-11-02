@@ -41,7 +41,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "lucide": "^1.66.0",
     "motion": "^14.9.0"
   },
   "devDependencies": {
