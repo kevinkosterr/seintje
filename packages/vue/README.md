@@ -22,8 +22,8 @@ const save = () =>
 </template>
 ```
 
-- `description` and `icon` accept text, VNodes and components. They render with your app's
-  context, so plugins and `inject` work inside toasts.
+- `description` and `icon` accept text, VNodes and components; `icon` also accepts inline SVG
+  markup. They render with your app's context, so plugins and `inject` work inside toasts.
 - `useSeintje()` returns the API plus a read-only `toasts` ref.
 
 MIT licensed.

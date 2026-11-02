@@ -43,9 +43,10 @@ Without a bundler:
 </script>
 ```
 
-`description` and `icon` accept text, a DOM node, or a renderer `(slot) => cleanup`.
+`description` and `icon` accept text, a DOM node, or a renderer `(slot) => cleanup`. An `icon`
+string that starts with `<svg` is rendered as inline SVG.
 
 Animation is powered by the framework-agnostic `animate()` from [motion](https://motion.dev);
-icons are from [Lucide](https://lucide.dev) (ISC).
+the built-in icons are adapted from [Lucide](https://lucide.dev) (ISC).
 
 Inspired by [Sileo](https://github.com/hiaaryan/sileo). MIT licensed.

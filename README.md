@@ -25,7 +25,7 @@ seintje.success({ title: "Saved", description: "Your changes are stored safely."
 ```
 
 All animation runs through the framework-agnostic `animate()` from [motion](https://motion.dev),
-and icons come from [Lucide](https://lucide.dev).
+its only dependency. The built-in icons are adapted from [Lucide](https://lucide.dev) (ISC).
 
 ## Features
 
