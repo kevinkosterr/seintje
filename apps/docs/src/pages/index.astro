@@ -1,0 +1,1188 @@
+---
+import { Code } from "@astrojs/starlight/components";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import {
+  Accessibility,
+  Activity,
+  Box,
+  Feather,
+  LayoutGrid,
+  Palette,
+  Pause,
+  Plug,
+  SunMoon,
+} from "lucide";
+import Icon from "../components/Icon.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const packages = {
+  vanilla: "seintje",
+  vue: "@seintje/vue",
+  svelte: "@seintje/svelte",
+} as const;
+
+const managers = {
+  bun: "bun add",
+  npm: "npm install",
+  pnpm: "pnpm add",
+} as const;
+
+const snippets = {
+  vanilla: {
+    lang: "ts",
+    file: "main.ts",
+    code: `import { createToaster, seintje } from "seintje";
+import "seintje/styles.css";
+
+createToaster(document.body, { position: "bottom-right" });
+
+seintje.success({
+  title: "Saved",
+  description: "Your changes are stored safely.",
+});`,
+  },
+  vue: {
+    lang: "vue",
+    file: "App.vue",
+    code: `<script setup lang="ts">
+import { seintje, Toaster } from "@seintje/vue";
+import "@seintje/vue/styles.css";
+</script>
+
+<template>
+  <button @click="seintje.success('Saved')">Save</button>
+  <Toaster position="bottom-right" />
+</template>`,
+  },
+  svelte: {
+    lang: "svelte",
+    file: "App.svelte",
+    code: `<script lang="ts">
+  import { seintje, Toaster } from "@seintje/svelte";
+  import "@seintje/svelte/styles.css";
+</script>
+
+<button onclick={() => seintje.success("Saved")}>Save</button>
+<Toaster position="bottom-right" />`,
+  },
+} as const;
+
+const frameworks = [
+  { id: "vanilla", label: "Vanilla" },
+  { id: "vue", label: "Vue" },
+  { id: "svelte", label: "Svelte" },
+] as const;
+
+const behaviours = [
+  {
+    id: "stretch",
+    method: "success()",
+    title: "Stretches into a card",
+    text: "A toast starts as a pill with its icon and title. Give it a description and it opens into a full-width card, as one shape, then closes again before it leaves.",
+    control: "Show with description",
+  },
+  {
+    id: "action",
+    method: "show({ action })",
+    title: "Actions where you want them",
+    text: 'An action sits next to the title, or under it with actionPlacement: "below". actionVisibility: "hover" keeps it out of the way until the pointer arrives.',
+    control: "Show with Undo",
+  },
+  {
+    id: "promise",
+    method: "promise()",
+    title: "Promise flows, swapped in place",
+    text: "seintje.promise() shows a loading toast and turns it into a success or error toast when the promise settles, without a second toast appearing.",
+    control: "Upload something",
+  },
+  {
+    id: "update",
+    method: "show({ id })",
+    title: "Updates, not duplicates",
+    text: "Show a toast with an id that is already on screen and its content is replaced in place. Progress counters stay one toast.",
+    control: "Count to three",
+  },
+  {
+    id: "pause",
+    method: "info()",
+    title: "Timers that wait for you",
+    text: "Hovering or focusing a toast pauses every timer of that toaster, and so does a hidden tab. Time left is kept, not restarted.",
+    control: "Show and hover it",
+  },
+  {
+    id: "dismiss",
+    method: "dismiss()",
+    title: "Three ways out",
+    text: "Swipe a toast up or down, press its close button, or hit Escape. Alt+T moves focus to the newest toast so keyboard users get the same choices.",
+    control: "Show three",
+  },
+] as const;
+
+const features = [
+  {
+    title: "One core",
+    items: [
+      {
+        icon: Box,
+        name: "Framework-agnostic",
+        text: "Plain TypeScript and DOM in the core. Use it from a bundler or straight from a CDN.",
+      },
+      {
+        icon: Plug,
+        name: "Thin adapters",
+        text: "@seintje/vue and @seintje/svelte mount the same core and accept VNodes, components and snippets as content.",
+      },
+      {
+        icon: Feather,
+        name: "One dependency",
+        text: "motion for animation. The icons are built in. Nothing else.",
+      },
+    ],
+  },
+  {
+    title: "Real motion",
+    items: [
+      {
+        icon: Activity,
+        name: "Springs with momentum",
+        text: "Every movement runs through animate() from motion, so an interrupted animation keeps its momentum.",
+      },
+      {
+        icon: LayoutGrid,
+        name: "Six positions",
+        text: "Top and bottom, left, centre and right. A toast can override its toaster's position.",
+      },
+      {
+        icon: Pause,
+        name: "Respects reduced motion",
+        text: "prefers-reduced-motion switches springs for fades, and you can force either.",
+      },
+    ],
+  },
+  {
+    title: "Finished details",
+    items: [
+      {
+        icon: Accessibility,
+        name: "Accessible by default",
+        text: "Live-region announcements, valid ARIA, keyboard focus with Alt+T, Escape to dismiss.",
+      },
+      {
+        icon: SunMoon,
+        name: "Light, dark and system",
+        text: "Dark toasts on light pages, light toasts on dark pages, or follow the system.",
+      },
+      {
+        icon: Palette,
+        name: "Themeable",
+        text: "CSS variables for colours, radius, font, gap and offsets, classes for every part, data attributes for every state.",
+      },
+    ],
+  },
+] as const;
+
+const options = [
+  ["title", "string", "name of the type"],
+  ["description", "Content", "—"],
+  ["type", "neutral | success | info | warning | error | loading", "set by the method"],
+  ["duration", "number | null", "5000"],
+  ["action", "{ label, onClick, dismiss? }", "—"],
+  ["actionPlacement", "inline | below", "inline"],
+  ["actionVisibility", "always | hover", "always"],
+  ["position", "Position", "the toaster's"],
+  ["autoExpand", "boolean | { delay?, hold? }", "true"],
+  ["dismissible", "boolean", "true"],
+  ["icon", "Content | null", "built-in icon of the type"],
+  ["fill", "string", "theme"],
+  ["radius", "number", "18"],
+  ["important", "boolean", "true for errors"],
+  ["id", "string", "generated"],
+  ["onDismiss", "(id) => void", "—"],
+] as const;
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Seintje",
+    description: "Framework-agnostic toast notifications for vanilla JavaScript, Vue and Svelte.",
+    template: "splash",
+    tableOfContents: false,
+  }}
+>
+  <div class="landing not-content">
+    <section class="bench">
+      <div class="bench__copy">
+        <h1 class="wordmark" id="_top">seintje</h1>
+        <p class="lede">
+          Toasts that stretch, merge and spring into place. One framework-agnostic core,
+          with thin adapters for Vue and Svelte.
+        </p>
+
+        <div class="controls" aria-label="Try a toast">
+          <button type="button" class="s-btn" data-fire="success">Success</button>
+          <button type="button" class="s-btn" data-fire="info">Info</button>
+          <button type="button" class="s-btn" data-fire="warning">Warning</button>
+          <button type="button" class="s-btn" data-fire="error">Error</button>
+          <button type="button" class="s-btn" data-fire="promise">Promise</button>
+          <button type="button" class="s-btn" data-fire="undo">Undo</button>
+          <button type="button" class="s-btn s-btn--quiet" data-fire="dismiss">Dismiss all</button>
+        </div>
+
+        <p class="hint">
+          Toasts land bottom-right. Hover one to pause it, swipe it away, or press
+          <kbd>Alt</kbd>+<kbd>T</kbd> to focus the stack.
+        </p>
+      </div>
+
+      <div class="bench__install" data-install>
+        <div class="tabs" role="tablist" aria-label="Package manager">
+          {Object.keys(managers).map((pm, i) => (
+            <button type="button" role="tab" data-pm={pm} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+              {pm}
+            </button>
+          ))}
+        </div>
+        <div class="command">
+          <span class="command__prompt" aria-hidden="true">$</span>
+          <code class="command__text" data-command>bun add seintje</code>
+          <button type="button" class="copy" data-copy aria-label="Copy install command">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span class="copy__done" aria-hidden="true">Copied</span>
+          </button>
+        </div>
+
+        <div class="tabs tabs--framework" role="tablist" aria-label="Framework">
+          {frameworks.map((f, i) => (
+            <button type="button" role="tab" data-framework={f.id} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+              {f.label}
+            </button>
+          ))}
+          <span class="tabs__file" data-file>{snippets.vanilla.file}</span>
+        </div>
+        <div class="panels">
+          {frameworks.map((f, i) => (
+            <div class="panel" role="tabpanel" data-panel={f.id} hidden={i !== 0}>
+              <Code lang={snippets[f.id].lang} code={snippets[f.id].code} frame="none" />
+            </div>
+          ))}
+        </div>
+
+        <div class="install__actions">
+          <a class="s-btn s-btn--primary" href={`${base}/guides/getting-started/`}>Get started</a>
+          <a class="textlink" href={`${base}/reference/toast-options/`}>Every option</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="behaviours" aria-labelledby="behaviours-title">
+      <div class="section-head">
+        <h2 id="behaviours-title">What a toast does</h2>
+        <p>Each one runs for real. Press the control and watch the stack.</p>
+      </div>
+      <ol class="rows">
+        {behaviours.map((b, i) => (
+          <li class="row">
+            <code class="row__n">{b.method}</code>
+            <div class="row__body">
+              <h3>{b.title}</h3>
+              <p>{b.text}</p>
+            </div>
+            <button type="button" class="s-btn" data-behaviour={b.id}>{b.control}</button>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="features" aria-labelledby="features-title">
+      <div class="section-head">
+        <h2 id="features-title">What you get</h2>
+      </div>
+      <div class="groups">
+        {features.map((group) => (
+          <div class="group">
+            <h3>{group.title}</h3>
+            <dl class="facts">
+              {group.items.map((item) => (
+                <div class="fact">
+                  <Icon node={item.icon} class="fact__icon" />
+                  <dt>{item.name}</dt>
+                  <dd>{item.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="legend" aria-labelledby="legend-title">
+      <div class="section-head">
+        <h2 id="legend-title">Every toast option</h2>
+        <p>
+          Pass any of these to <code>seintje.show()</code> or a typed method.{" "}
+          <a href={`${base}/reference/toast-options/`}>Read the full reference.</a>
+        </p>
+      </div>
+      <table class="opts">
+        <thead>
+          <tr><th scope="col">Option</th><th scope="col">Type</th><th scope="col">Default</th></tr>
+        </thead>
+        <tbody>
+          {options.map(([name, type, def]) => (
+            <tr>
+              <td><code>{name}</code></td>
+              <td><code class="type">{type}</code></td>
+              <td>{def}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="packages" aria-labelledby="packages-title">
+      <div class="section-head">
+        <h2 id="packages-title">Three packages, one toast</h2>
+        <p>Every adapter mounts the same core, so a toast looks and moves the same wherever you use it.</p>
+      </div>
+      <ul class="pkgs">
+        <li class="pkg">
+          <code class="pkg__name">seintje</code>
+          <p>The core. Plain TypeScript and DOM, works without any framework.</p>
+          <a href={`${base}/guides/vanilla/`}>Vanilla guide</a>
+        </li>
+        <li class="pkg">
+          <code class="pkg__name">@seintje/vue</code>
+          <p><code>&lt;Toaster&gt;</code> and <code>useSeintje()</code> for Vue 3.4 and up.</p>
+          <a href={`${base}/guides/vue/`}>Vue guide</a>
+        </li>
+        <li class="pkg">
+          <code class="pkg__name">@seintje/svelte</code>
+          <p><code>&lt;Toaster&gt;</code> and a <code>toasts</code> store for Svelte 5.</p>
+          <a href={`${base}/guides/svelte/`}>Svelte guide</a>
+        </li>
+      </ul>
+    </section>
+
+    <footer class="close">
+      <p class="close__name" aria-hidden="true">seintje</p>
+      <p class="close__copy">
+        Dutch for “a little heads-up”. MIT licensed, inspired by{" "}
+        <a href="https://github.com/hiaaryan/sileo" rel="noopener">Sileo</a>.
+      </p>
+      <div class="close__actions">
+        <a class="s-btn s-btn--primary" href={`${base}/guides/getting-started/`}>Get started</a>
+        <a class="s-btn" href="https://github.com/kevinkosterr/seintje" rel="noopener">GitHub</a>
+      </div>
+    </footer>
+  </div>
+</StarlightPage>
+
+<style is:global>
+  /* Landing-only adjustments to Starlight's frame. */
+  html:not([data-has-sidebar]) {
+    --sl-content-width: 72rem;
+  }
+  main:has(.landing) > .content-panel {
+    padding-block: 0;
+    border-top: 0;
+  }
+  main:has(.landing) > .content-panel:first-child {
+    display: none;
+  }
+  main:has(.landing) footer.sl-flex {
+    display: none;
+  }
+  main:has(.landing) .sl-markdown-content {
+    margin-top: 0;
+  }
+  main:has(.landing) .expressive-code .frame.is-terminal .header,
+  main:has(.landing) .expressive-code .frame.has-title .header {
+    display: none;
+  }
+  main:has(.landing) .expressive-code pre {
+    border: 0;
+    background: transparent;
+  }
+  /* The install command has its own copy control; the panel's would cover the first line on phones. */
+  main:has(.landing) .expressive-code .copy {
+    display: none;
+  }
+</style>
+
+<style>
+  .landing {
+    --pad: clamp(1rem, 4vw, 2.5rem);
+    color: var(--s-ink-2);
+    padding-bottom: 4rem;
+  }
+
+  .landing :is(h1, h2, h3) {
+    color: var(--s-ink);
+    text-wrap: balance;
+  }
+
+  .landing a:not(.s-btn) {
+    color: var(--s-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--s-line-2);
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .landing a:not(.s-btn):hover {
+    text-decoration-color: var(--s-accent-ink);
+  }
+
+  .landing code {
+    font-family: var(--s-mono);
+    font-size: 0.85em;
+    color: var(--s-ink);
+  }
+
+  .landing kbd {
+    font-family: var(--s-mono);
+    font-size: 0.75rem;
+    border: 1px solid var(--s-line-2);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 0.05em 0.4em;
+    color: var(--s-ink);
+  }
+
+  /* ---------------------------------------------------------------- Bench */
+
+  .bench {
+    display: grid;
+    grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    padding: clamp(2.5rem, 7vh, 5rem) 0 clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  .wordmark {
+    font-size: clamp(4rem, 9.5vw, 7.75rem);
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    margin: 0 0 1.5rem -0.04em;
+  }
+
+  .lede {
+    font-size: clamp(1.125rem, 1.4vw, 1.25rem);
+    line-height: 1.5;
+    max-width: 30ch;
+    margin: 0 0 2rem;
+    color: var(--s-ink-2);
+    text-wrap: pretty;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .hint {
+    font-size: 0.8125rem;
+    color: var(--s-ink-3);
+    max-width: 40ch;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* -------------------------------------------------------------- Install */
+
+  .bench__install {
+    display: grid;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--s-line);
+    border-radius: 999px;
+    width: max-content;
+    max-width: 100%;
+  }
+
+  .tabs--framework {
+    width: 100%;
+    border: 0;
+    padding: 0.5rem 0 0;
+    border-radius: 0;
+  }
+
+  .tabs [role="tab"] {
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--s-ink-3);
+    background: transparent;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .tabs [role="tab"]:hover {
+    color: var(--s-ink-2);
+  }
+
+  .tabs [role="tab"][aria-selected="true"] {
+    color: var(--s-ink);
+    background: var(--s-panel-2);
+  }
+
+  .tabs--framework [role="tab"][aria-selected="true"] {
+    background: var(--s-panel);
+    box-shadow: inset 0 0 0 1px var(--s-line-2);
+  }
+
+  .tabs__file {
+    margin-left: auto;
+    font-family: var(--s-mono);
+    font-size: 0.75rem;
+    color: var(--s-ink-3);
+  }
+
+  .command {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 2.75rem;
+    padding: 0 0.5rem 0 1rem;
+    border: 1px solid var(--s-line);
+    border-radius: 12px;
+    background: var(--s-panel);
+    font-family: var(--s-mono);
+    font-size: 0.8125rem;
+  }
+
+  .command__prompt {
+    color: var(--s-ink-3);
+  }
+
+  .command__text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: inherit;
+  }
+
+  .copy {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--s-ink-3);
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .copy:hover {
+    color: var(--s-ink);
+    background: var(--s-panel-2);
+  }
+
+  .copy__done {
+    position: absolute;
+    right: calc(100% + 0.5rem);
+    top: 50%;
+    translate: 0 -50%;
+    font-family: var(--s-sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--s-ink);
+    background: var(--s-panel-2);
+    border: 1px solid var(--s-line-2);
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    opacity: 0;
+    transition: opacity 150ms ease;
+    pointer-events: none;
+  }
+
+  .copy[data-copied] .copy__done {
+    opacity: 1;
+  }
+
+  .panels {
+    border: 1px solid var(--s-line);
+    border-radius: 12px;
+    background: var(--s-panel);
+    overflow: hidden;
+  }
+
+  .panel {
+    animation: panel-in 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      translate: 0 4px;
+    }
+  }
+
+  .install__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-top: 0.5rem;
+  }
+
+  .landing a.textlink {
+    font-size: 1rem;
+    color: var(--s-accent-ink);
+  }
+
+  /* --------------------------------------------------------- Sections */
+
+  section + section,
+  .close {
+    border-top: 1px solid var(--s-line);
+    padding-top: clamp(3rem, 8vh, 5rem);
+    margin-top: clamp(3rem, 8vh, 5rem);
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem 3rem;
+    align-items: end;
+    margin-bottom: 2rem;
+  }
+
+  .section-head h2 {
+    font-size: clamp(1.625rem, 2.6vw, 2.25rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .section-head p {
+    margin: 0;
+    max-width: 48ch;
+    font-size: 1rem;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  /* Behaviour rows. */
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--s-line);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+    gap: 1rem 1.5rem;
+    align-items: start;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--s-line);
+  }
+
+  .row__n {
+    font-family: var(--s-mono);
+    font-size: 0.75rem;
+    color: var(--s-ink-3);
+    padding-top: 0.35rem;
+    white-space: nowrap;
+  }
+
+  .row:last-child {
+    border-bottom: 0;
+  }
+
+  .row__body h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.35rem;
+  }
+
+  .row__body p {
+    margin: 0;
+    max-width: 62ch;
+    font-size: 1rem;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .row .s-btn {
+    justify-self: end;
+    white-space: nowrap;
+  }
+
+  /* Feature groups: one raised field, three columns, icon-led rows. */
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.5rem 3rem;
+    padding: clamp(1.5rem, 3.5vw, 2.75rem);
+    border-radius: 12px;
+    background: var(--s-panel);
+  }
+
+  .group h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.25rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--s-line-2);
+  }
+
+  .facts {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+  }
+
+  .fact {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    column-gap: 0.875rem;
+    align-items: start;
+  }
+
+  .fact__icon {
+    grid-row: 1 / span 2;
+    margin-top: 0.1rem;
+    color: var(--s-ink);
+  }
+
+  .fact dt {
+    font-weight: 600;
+    color: var(--s-ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.25rem;
+  }
+
+  .fact dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  /* Option legend. */
+  .opts {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .opts th {
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--s-ink-3);
+    padding: 0 1rem 0.6rem 0;
+    border-bottom: 1px solid var(--s-line-2);
+  }
+
+  .opts td {
+    padding: 0.6rem 1rem 0.6rem 0;
+    border-bottom: 1px solid var(--s-line);
+    vertical-align: top;
+  }
+
+  .opts tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .opts td:last-child {
+    color: var(--s-ink-2);
+  }
+
+  .opts code.type {
+    color: var(--s-ink-2);
+  }
+
+  /* Packages. */
+  .pkgs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--s-line);
+  }
+
+  .pkg {
+    padding: 1.5rem 1.5rem 1.5rem 0;
+    border-bottom: 1px solid var(--s-line);
+  }
+
+  .pkg + .pkg {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--s-line);
+  }
+
+  .pkg:last-child {
+    border-bottom: 0;
+  }
+
+  .pkg__name {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .pkg p {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .pkg a {
+    font-size: 1rem;
+  }
+
+  /* Close: the name returns across the full width. */
+  .close {
+    container-type: inline-size;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+    flex-wrap: wrap;
+  }
+
+  .landing .close__name {
+    flex-basis: 100%;
+    font-size: 34cqi;
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 0.8;
+    color: var(--s-ink);
+    /* Room under the baseline for the descender of the j. */
+    margin: 0 0 0.16em -0.04em;
+  }
+
+  .landing .close__copy {
+    margin: 0;
+    max-width: 44ch;
+  }
+
+  .close__actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  /* ------------------------------------------------------------ Narrow */
+
+  @media (max-width: 64rem) {
+    .bench {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
+    }
+    .groups {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .bench {
+      padding-top: 2rem;
+      padding-bottom: 1rem;
+    }
+    .wordmark {
+      font-size: clamp(3.25rem, 17vw, 4.5rem);
+    }
+    .section-head {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .groups {
+      padding: 1.25rem 1rem;
+      margin-inline: -0.25rem;
+    }
+    .row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .row__n {
+      padding-top: 0;
+    }
+    .row__body {
+      grid-column: 1;
+    }
+    .row .s-btn {
+      grid-column: 1;
+      justify-self: start;
+    }
+    .pkgs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pkg,
+    .pkg + .pkg {
+      padding: 1.25rem 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--s-line);
+    }
+    .pkg:last-child {
+      border-bottom: 0;
+    }
+    .opts {
+      font-size: 0.8125rem;
+    }
+    .opts th:nth-child(3),
+    .opts td:nth-child(3) {
+      display: none;
+    }
+    .opts td:nth-child(2) {
+      word-break: break-word;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { seintje } from "seintje";
+  import { ensureDocsToaster } from "../components/docs-toaster";
+
+  const PACKAGES: Record<string, string> = {
+    vanilla: "seintje",
+    vue: "@seintje/vue",
+    svelte: "@seintje/svelte",
+  };
+  const MANAGERS: Record<string, string> = {
+    bun: "bun add",
+    npm: "npm install",
+    pnpm: "pnpm add",
+  };
+  const FILES: Record<string, string> = {
+    vanilla: "main.ts",
+    vue: "App.vue",
+    svelte: "App.svelte",
+  };
+
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  ensureDocsToaster();
+
+  /* ------------------------------------------------------------ Install tabs */
+
+  const install = document.querySelector<HTMLElement>("[data-install]");
+  if (install) {
+    const read = (key: string, fallback: string) => {
+      try {
+        return localStorage.getItem(key) ?? fallback;
+      } catch {
+        return fallback;
+      }
+    };
+    const write = (key: string, value: string) => {
+      try {
+        localStorage.setItem(key, value);
+      } catch {}
+    };
+
+    let pm = read("seintje-pm", "bun");
+    const SYNC_KEY = "starlight-synced-tabs__framework";
+    const LABELS: Record<string, string> = { vanilla: "Vanilla", vue: "Vue", svelte: "Svelte" };
+    let framework = read("seintje-framework", read(SYNC_KEY, "Vanilla").toLowerCase());
+    if (!(pm in MANAGERS)) pm = "bun";
+    if (!(framework in PACKAGES)) framework = "vanilla";
+
+    const command = install.querySelector<HTMLElement>("[data-command]")!;
+    const file = install.querySelector<HTMLElement>("[data-file]")!;
+
+    const render = () => {
+      command.textContent = `${MANAGERS[pm]} ${PACKAGES[framework]}`;
+      file.textContent = FILES[framework];
+      for (const tab of install.querySelectorAll<HTMLButtonElement>("[data-pm]")) {
+        const on = tab.dataset.pm === pm;
+        tab.setAttribute("aria-selected", String(on));
+        tab.tabIndex = on ? 0 : -1;
+      }
+      for (const tab of install.querySelectorAll<HTMLButtonElement>("[data-framework]")) {
+        const on = tab.dataset.framework === framework;
+        tab.setAttribute("aria-selected", String(on));
+        tab.tabIndex = on ? 0 : -1;
+      }
+      for (const panel of install.querySelectorAll<HTMLElement>("[data-panel]")) {
+        panel.hidden = panel.dataset.panel !== framework;
+      }
+    };
+
+    const wireTablist = (selector: string, apply: (value: string) => void) => {
+      const tabs = [...install.querySelectorAll<HTMLButtonElement>(selector)];
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => apply(tab.dataset.pm ?? tab.dataset.framework ?? ""));
+        tab.addEventListener("keydown", (event) => {
+          const delta = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+          const jump = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : -1;
+          if (!delta && jump < 0) return;
+          event.preventDefault();
+          const next = jump >= 0 ? tabs[jump] : tabs[(index + delta + tabs.length) % tabs.length];
+          next.focus();
+          apply(next.dataset.pm ?? next.dataset.framework ?? "");
+        });
+      });
+    };
+
+    wireTablist("[data-pm]", (value) => {
+      pm = value;
+      write("seintje-pm", pm);
+      render();
+    });
+    wireTablist("[data-framework]", (value) => {
+      framework = value;
+      write("seintje-framework", framework);
+      write(SYNC_KEY, LABELS[framework]);
+      render();
+    });
+    render();
+
+    const copy = install.querySelector<HTMLButtonElement>("[data-copy]")!;
+    let copiedTimer = 0;
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(command.textContent ?? "");
+        copy.dataset.copied = "";
+        seintje.success({ title: "Copied", description: command.textContent ?? "", duration: 2500 });
+        clearTimeout(copiedTimer);
+        copiedTimer = window.setTimeout(() => delete copy.dataset.copied, 1600);
+      } catch {
+        seintje.error({ title: "Could not copy", description: "Select the command and copy it by hand." });
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------ Hero controls */
+
+  const fire: Record<string, () => unknown> = {
+    success: () => seintje.success({ title: "Saved", description: "Your changes are stored safely." }),
+    info: () => seintje.info({ title: "Tip", description: "Press Alt+T to jump to your toasts." }),
+    warning: () => seintje.warning({ title: "Low on space", description: "Only 300 MB left on this device." }),
+    error: () => seintje.error({ title: "Payment failed", description: "Your card was declined." }),
+    promise: () =>
+      seintje
+        .promise(wait(1600), {
+          loading: "Uploading",
+          success: { title: "Uploaded", description: "report.pdf is ready to share." },
+          error: "Upload failed",
+        })
+        .catch(() => {}),
+    undo: () =>
+      seintje.show({
+        type: "info",
+        title: "Conversation archived",
+        description: "You can find it under Archive.",
+        action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
+      }),
+    dismiss: () => seintje.dismiss(),
+  };
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-fire]")) {
+    button.addEventListener("click", () => void fire[button.dataset.fire ?? ""]?.());
+  }
+
+  /* ------------------------------------------------------------ Behaviour rows */
+
+  const behaviours: Record<string, () => unknown> = {
+    stretch: () =>
+      seintje.success({
+        title: "Changes published",
+        description: "Your site is live. It can take a minute before every visitor sees it.",
+      }),
+    action: () => {
+      seintje.show({
+        title: "Draft discarded",
+        action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
+      });
+      seintje.show({
+        type: "info",
+        title: "Conversation archived",
+        description: "You can find it under Archive.",
+        action: { label: "Undo", onClick: () => seintje.success("Restored"), dismiss: true },
+        actionPlacement: "below",
+      });
+    },
+    promise: () => {
+      const fail = Math.random() < 0.35;
+      return seintje
+        .promise(
+          wait(1800).then(() => {
+            if (fail) throw new Error("Network unreachable");
+          }),
+          {
+            loading: "Uploading report.pdf",
+            success: { title: "Uploaded", description: "report.pdf is ready to share." },
+            error: (err) => ({ title: "Upload failed", description: (err as Error).message }),
+          },
+        )
+        .catch(() => {});
+    },
+    update: async () => {
+      const id = "count";
+      seintje.loading({ id, title: "Processing 1 of 3" });
+      await wait(900);
+      seintje.loading({ id, title: "Processing 2 of 3" });
+      await wait(900);
+      seintje.loading({ id, title: "Processing 3 of 3" });
+      await wait(900);
+      seintje.success({ id, title: "Done", description: "Three steps, one toast." });
+    },
+    pause: () =>
+      seintje.info({
+        title: "Hover me",
+        description: "The timer stops while you are here and picks up where it left off.",
+        duration: 6000,
+      }),
+    dismiss: () => {
+      seintje.show("Swipe me up or down");
+      seintje.show("Or press my close button");
+      seintje.show({ title: "Or press Escape", description: "Alt+T focuses the newest toast first." });
+    },
+  };
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-behaviour]")) {
+    button.addEventListener("click", () => void behaviours[button.dataset.behaviour ?? ""]?.());
+  }
+
+  /* ------------------------------------------------------------ First toast */
+
+  // One toast, once per session, so the stretch is seen before anything is clicked.
+  let seen = false;
+  try {
+    seen = sessionStorage.getItem("seintje-welcomed") === "1";
+  } catch {}
+  if (!seen && !reducedMotion) {
+    window.setTimeout(() => {
+      seintje.success({ title: "Hello", description: "This is a real toast. Hover it, swipe it, or press Escape." });
+      try {
+        sessionStorage.setItem("seintje-welcomed", "1");
+      } catch {}
+    }, 900);
+  }
+</script>

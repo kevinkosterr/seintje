@@ -1,0 +1,31 @@
+---
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+---
+
+<a href={siteTitleHref} class="site-title">
+  <svg class="mark" viewBox="0 0 32 32" aria-hidden="true" width="22" height="22">
+    <rect x="4" y="5" width="20" height="10" rx="5" fill="currentColor" />
+    <rect x="4" y="12" width="24" height="15" rx="6" fill="currentColor" />
+    <path d="M10.5 10l2 2 4-4" fill="none" stroke="var(--s-bg)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+  <span translate="no">{siteTitle.toLowerCase()}</span>
+</a>
+
+<style>
+  .site-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--s-ink);
+    text-decoration: none;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .mark {
+    flex: none;
+    color: var(--s-ink);
+  }
+</style>

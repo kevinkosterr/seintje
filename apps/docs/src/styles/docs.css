@@ -1,3 +1,382 @@
+/* Seintje docs theme: the modern developer bench. Near-black ground, one grotesk, hairline panels. */
+
+@import "@fontsource-variable/schibsted-grotesk";
+@import "@fontsource-variable/jetbrains-mono";
+
+:root {
+  --s-sans:
+    "Schibsted Grotesk Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --s-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Dark bench (default). */
+  --s-bg: #0a0a0b;
+  --s-panel: #121214;
+  --s-panel-2: #18181b;
+  --s-line: #232326;
+  --s-line-2: #2e2e33;
+  --s-ink: #fafaf8;
+  --s-ink-2: #a3a3ab;
+  --s-ink-3: #80808a;
+  --s-accent: #3f5ef5;
+  --s-accent-ink: #8fa3ff;
+  --s-selection: rgb(63 94 245 / 0.35);
+
+  --sl-font: var(--s-sans);
+  --sl-font-mono: var(--s-mono);
+  --sl-line-height: 1.65;
+
+  --sl-color-white: var(--s-ink);
+  --sl-color-gray-1: #e4e4e7;
+  --sl-color-gray-2: var(--s-ink-2);
+  --sl-color-gray-3: var(--s-ink-3);
+  --sl-color-gray-4: #3f3f46;
+  --sl-color-gray-5: var(--s-line-2);
+  --sl-color-gray-6: var(--s-panel);
+  --sl-color-black: var(--s-bg);
+
+  --sl-color-accent-low: #15205a;
+  --sl-color-accent: var(--s-accent);
+  --sl-color-accent-high: var(--s-accent-ink);
+  --sl-color-text: var(--s-ink-2);
+  --sl-color-text-accent: var(--s-ink);
+  --sl-color-text-invert: var(--s-bg);
+  --sl-color-bg: var(--s-bg);
+  --sl-color-bg-nav: var(--s-bg);
+  --sl-color-bg-sidebar: var(--s-bg);
+  --sl-color-bg-inline-code: var(--s-panel-2);
+  --sl-color-bg-accent: var(--s-ink);
+  --sl-color-hairline-light: var(--s-line-2);
+  --sl-color-hairline: var(--s-line);
+  --sl-color-hairline-shade: var(--s-line);
+  --sl-color-backdrop-overlay: rgb(10 10 11 / 0.7);
+
+  --sl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --sl-shadow-md: 0 8px 24px rgb(0 0 0 / 0.45);
+  --sl-shadow-lg: 0 24px 48px rgb(0 0 0 / 0.5);
+
+  --sl-text-h1: 2.5rem;
+  --sl-text-h2: 1.625rem;
+  --sl-text-h3: 1.25rem;
+  --sl-text-h4: 1.0625rem;
+  --sl-text-code: 0.875rem;
+
+  --seintje-font: var(--s-sans);
+}
+
+:root[data-theme="light"],
+[data-theme="light"] ::backdrop {
+  --s-bg: #fafaf8;
+  --s-panel: #ffffff;
+  --s-panel-2: #f1f1ee;
+  --s-line: #e6e6e1;
+  --s-line-2: #d6d6d0;
+  --s-ink: #0a0a0b;
+  --s-ink-2: #55555c;
+  --s-ink-3: #6e6e75;
+  --s-accent: #3f5ef5;
+  --s-accent-ink: #2f49c9;
+  --s-selection: rgb(63 94 245 / 0.22);
+
+  --sl-color-gray-1: #26262b;
+  --sl-color-gray-4: #c4c4bf;
+  --sl-color-gray-7: var(--s-panel-2);
+  --sl-color-accent-low: #e3e8ff;
+  --sl-color-bg-accent: var(--s-ink);
+  --sl-color-text-invert: var(--s-bg);
+  --sl-color-backdrop-overlay: rgb(10 10 11 / 0.35);
+  --sl-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+  --sl-shadow-md: 0 8px 24px rgb(0 0 0 / 0.08);
+  --sl-shadow-lg: 0 24px 48px rgb(0 0 0 / 0.12);
+}
+
+/* ------------------------------------------------------------ Browser surfaces */
+
+::selection {
+  background: var(--s-selection);
+  color: var(--s-ink);
+}
+
+html {
+  scrollbar-color: var(--s-line-2) transparent;
+  accent-color: var(--s-accent);
+}
+
+body {
+  font-feature-settings: "ss01", "cv05";
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--s-accent-ink);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------- Header */
+
+.header {
+  --sl-nav-gap: 1.25rem;
+}
+
+/* Search button: a quiet hairline pill. */
+site-search > button[data-open-modal] {
+  border: 1px solid var(--s-line);
+  background: var(--s-panel);
+  color: var(--s-ink-3);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  transition:
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+site-search > button[data-open-modal]:hover {
+  border-color: var(--s-line-2);
+  color: var(--s-ink-2);
+}
+
+site-search > button[data-open-modal] > kbd {
+  background: transparent;
+  border: 1px solid var(--s-line);
+  color: var(--s-ink-3);
+  font-family: var(--s-mono);
+}
+
+/* The theme select and social icons. */
+starlight-theme-select label {
+  color: var(--s-ink-3);
+}
+
+starlight-theme-select select {
+  font-family: var(--s-sans);
+  font-size: 0.8125rem;
+}
+
+.social-icons a {
+  color: var(--s-ink-2);
+}
+
+.social-icons a:hover {
+  color: var(--s-ink);
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------- Sidebar */
+
+/* Right-hand table of contents. */
+starlight-toc h2,
+mobile-starlight-toc h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--s-ink-3);
+}
+
+starlight-toc a[href] {
+  color: var(--s-ink-3);
+  font-size: 0.8125rem;
+}
+
+starlight-toc a[href][aria-current="true"] {
+  color: var(--s-ink);
+  font-weight: 500;
+}
+
+.sidebar-content {
+  font-size: 0.875rem;
+}
+
+.sidebar-content .large {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--s-ink-3);
+}
+
+.sidebar-content summary {
+  padding-block: 0.35em;
+}
+
+.sidebar-content details > summary + ul {
+  margin-top: 0.1rem;
+}
+
+.sidebar-content a {
+  color: var(--s-ink-2);
+  border-radius: 6px;
+  padding: 0.3em 0.5rem;
+}
+
+.sidebar-content a:hover {
+  color: var(--s-ink);
+  background: var(--s-panel-2);
+}
+
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+  background: var(--s-panel-2);
+  color: var(--s-ink);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------- Content */
+
+.sl-markdown-content :is(h1, h2, h3, h4) {
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.sl-markdown-content h1,
+h1[data-page-title] {
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+
+.sl-markdown-content h2:not(:where(.not-content *)) {
+  padding-top: 0.5rem;
+  margin-top: 2.5em;
+}
+
+.sl-markdown-content p,
+.sl-markdown-content li {
+  color: var(--s-ink-2);
+  text-wrap: pretty;
+}
+
+.sl-markdown-content strong {
+  color: var(--s-ink);
+  font-weight: 600;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--s-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--s-accent-ink);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 150ms ease;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+  text-decoration-color: var(--s-accent-ink);
+}
+
+.sl-markdown-content code:not(:where(.not-content *)) {
+  font-family: var(--s-mono);
+  font-size: 0.85em;
+  background: var(--s-panel-2);
+  border: 1px solid var(--s-line);
+  border-radius: 5px;
+  padding: 0.1em 0.35em;
+  color: var(--s-ink);
+}
+
+.sl-markdown-content kbd:not(:where(.not-content *)) {
+  font-family: var(--s-mono);
+  font-size: 0.8em;
+  border: 1px solid var(--s-line-2);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 0.05em 0.4em;
+  color: var(--s-ink);
+}
+
+/* Tables: ruled, not boxed. */
+.sl-markdown-content table:not(:where(.not-content *)) {
+  font-size: 0.875rem;
+  border-collapse: collapse;
+  width: 100%;
+  display: table;
+}
+
+.sl-markdown-content th:not(:where(.not-content *)) {
+  color: var(--s-ink-3);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid var(--s-line-2);
+  padding: 0.5rem 0.75rem 0.5rem 0;
+}
+
+.sl-markdown-content td:not(:where(.not-content *)) {
+  border: 0;
+  border-bottom: 1px solid var(--s-line);
+  padding: 0.6rem 0.75rem 0.6rem 0;
+  vertical-align: top;
+  color: var(--s-ink-2);
+}
+
+.sl-markdown-content tr:nth-child(2n) td:not(:where(.not-content *)) {
+  background: transparent;
+}
+
+.sl-markdown-content td:first-child code:not(:where(.not-content *)) {
+  color: var(--s-ink);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 0.8125rem;
+}
+
+/* Starlight tabs re-skinned as hairline pills. */
+starlight-tabs .tablist-wrapper {
+  margin-bottom: 0.25rem;
+}
+
+starlight-tabs [role="tablist"] {
+  border-bottom: 0;
+  gap: 0.25rem;
+}
+
+starlight-tabs .tab > [role="tab"] {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--s-ink-3);
+  text-decoration: none;
+}
+
+starlight-tabs .tab > [role="tab"]:hover {
+  color: var(--s-ink-2);
+}
+
+starlight-tabs .tab > [role="tab"][aria-selected="true"] {
+  border-color: var(--s-line-2);
+  background: var(--s-panel);
+  color: var(--s-ink);
+  font-weight: 500;
+}
+
+/* Previous / next links. */
+.pagination-links a {
+  border: 1px solid var(--s-line);
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--s-ink);
+}
+
+.pagination-links a:hover {
+  border-color: var(--s-line-2);
+}
+
+.pagination-links a > span {
+  color: var(--s-ink-3);
+}
+
+/* Images in the guides. */
+.sl-markdown-content img:not(:where(.not-content *)) {
+  border-radius: 12px;
+  border: 1px solid var(--s-line);
+}
+
+/* ---------------------------------------------------------------- Demo controls */
+
 .seintje-demo {
   display: flex;
   flex-wrap: wrap;
@@ -5,22 +384,65 @@
   margin-block: 1rem;
 }
 
-.seintje-demo button {
+.seintje-demo button,
+.s-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.85rem;
   font: inherit;
-  font-size: var(--sl-text-sm);
-  padding: 0.35rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--s-ink);
+  background: var(--s-panel);
+  border: 1px solid var(--s-line-2);
   border-radius: 999px;
-  border: 1px solid var(--sl-color-gray-5);
-  background: var(--sl-color-gray-6);
-  color: var(--sl-color-white);
+  text-decoration: none;
   cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
-.seintje-demo button:hover {
-  border-color: var(--sl-color-accent);
+.seintje-demo button:hover,
+.s-btn:hover {
+  border-color: var(--s-ink-3);
+  background: var(--s-panel-2);
 }
 
-.hero img,
-.sl-markdown-content img {
-  border-radius: 1rem;
+.seintje-demo button:active,
+.s-btn:active {
+  transform: scale(0.97);
+}
+
+.s-btn--primary {
+  background: var(--s-ink);
+  border-color: var(--s-ink);
+  color: var(--s-bg);
+}
+
+.s-btn--primary:hover {
+  background: var(--s-ink);
+  border-color: var(--s-ink);
+  opacity: 0.9;
+}
+
+.s-btn--quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--s-ink-2);
+}
+
+.s-btn--quiet:hover {
+  background: var(--s-panel-2);
+  border-color: transparent;
+  color: var(--s-ink);
+}
+
+/* Code frames: no terminal title bar, the command is the whole panel. */
+.expressive-code .frame.is-terminal:not(.has-title) .header {
+  display: none;
 }

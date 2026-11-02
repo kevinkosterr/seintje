@@ -1,0 +1,20 @@
+---
+const PAGE_TITLE_ID = "_top";
+
+// The landing page draws its own title; every other page gets Starlight's.
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+const isLanding = Astro.url.pathname.replace(/\/$/, "") === base;
+---
+
+{!isLanding && <h1 id={PAGE_TITLE_ID}>{Astro.locals.starlightRoute.entry.data.title}</h1>}
+
+<style>
+  h1 {
+    margin-top: 1rem;
+    font-size: var(--sl-text-h1);
+    line-height: var(--sl-line-height-headings);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--sl-color-white);
+  }
+</style>
