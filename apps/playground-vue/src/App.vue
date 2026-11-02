@@ -5,6 +5,7 @@ import Greeting from "./Greeting.vue";
 
 const position = ref<Position>("bottom-right");
 const theme = ref<Theme>("system");
+const limit = ref(5);
 const { toasts } = useSeintje();
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -53,9 +54,13 @@ const demos = {
       <select v-model="theme">
         <option>system</option><option>light</option><option>dark</option>
       </select>
+      <select v-model="limit">
+        <option v-for="value in [1, 3, 5, 10]" :key="value" :value="value">limit {{ value }}</option>
+        <option :value="Infinity">no limit</option>
+      </select>
     </div>
   </main>
-  <Toaster :position="position" :theme="theme" />
+  <Toaster :position="position" :theme="theme" :limit="limit" />
 </template>
 
 <style>

@@ -4,6 +4,7 @@ import Greeting from "./Greeting.svelte";
 
 let position: Position = $state("bottom-right");
 let theme: Theme = $state("system");
+let limit = $state(5);
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -61,10 +62,16 @@ const demos: Record<string, () => unknown> = {
     <select bind:value={theme}>
       <option>system</option><option>light</option><option>dark</option>
     </select>
+    <select bind:value={limit}>
+      {#each [1, 3, 5, 10] as value (value)}
+        <option {value}>limit {value}</option>
+      {/each}
+      <option value={Infinity}>no limit</option>
+    </select>
   </div>
 </main>
 
-<Toaster {position} {theme} />
+<Toaster {position} {theme} {limit} />
 
 <style>
   :global(:root) { color-scheme: light dark; font-family: system-ui, sans-serif; }
