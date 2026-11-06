@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.2](https://github.com/kevinkosterr/seintje/compare/seintje-v0.1.1...seintje-v0.1.2) (2026-11-06)
+
+
+### Features
+
+* **seintje:** add keepExpanded option ([c827f42](https://github.com/kevinkosterr/seintje/commit/c827f422871090526082fb4b606214d639a85231))
+* **seintje:** add keepExpanded option ([2ffcd7e](https://github.com/kevinkosterr/seintje/commit/2ffcd7e5b32b79b38e82a7236962703a2716e2d7))
+
 ## [0.1.1](https://github.com/kevinkosterr/seintje/compare/seintje-v0.1.0...seintje-v0.1.1) (2026-11-02)
 
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.2](https://github.com/kevinkosterr/seintje/compare/vue-v0.1.1...vue-v0.1.2) (2026-11-06)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * seintje bumped to 0.1.2
+
 ## [0.1.1](https://github.com/kevinkosterr/seintje/compare/vue-v0.1.0...vue-v0.1.1) (2026-11-02)
 
 
