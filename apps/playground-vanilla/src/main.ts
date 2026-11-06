@@ -61,6 +61,12 @@ const demos: Record<string, () => void> = {
       description: "Trying to reconnect…",
       duration: null,
     }),
+  "keep-expanded": () =>
+    seintje.info({
+      title: "Release notes",
+      description: "This toast stays open once it has expanded.",
+      keepExpanded: true,
+    }),
   custom: () =>
     seintje.show({
       title: "Custom content",
@@ -90,6 +96,11 @@ select("motion").addEventListener("change", (e) =>
 );
 select("limit").addEventListener("change", (e) =>
   toaster.update({ limit: Number((e.target as HTMLSelectElement).value) }),
+);
+
+const keepExpanded = document.getElementById("keep-expanded") as HTMLInputElement;
+keepExpanded.addEventListener("change", () =>
+  toaster.update({ defaults: { keepExpanded: keepExpanded.checked } }),
 );
 
 Object.assign(window, { seintje, toaster });

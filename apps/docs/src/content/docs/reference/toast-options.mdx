@@ -17,6 +17,7 @@ description: Everything a single toast can be configured with.
 | `actionVisibility` | `"always" \| "hover"` | `"always"` | `hover` only shows the action while the toast is hovered or focused. |
 | `dismissible` | `boolean` | `true` | Allows swipe, the close button and Escape. |
 | `autoExpand` | `boolean \| { delay?, hold? }` | `true` | Opens the body by itself when there is a description. `delay` is the wait before opening (default `220`); `hold` how long it stays open (default: until 1.5 s before it is dismissed, or for good when it has no duration). |
+| `keepExpanded` | `boolean` | `false` | Once the body has opened, by itself or on hover or focus, it stays open instead of collapsing when `hold` runs out or the pointer or focus leaves. |
 | `fill` | `string` | theme | Background colour of the shape. |
 | `radius` | `number` | `--seintje-radius`, else `18` | Corner radius in pixels. |
 | `important` | `boolean` | `true` for errors | Announce through the assertive live region. |

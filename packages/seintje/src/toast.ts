@@ -139,6 +139,8 @@ export class ToastView {
   private bodyHeight = MIN_BODY_HEIGHT;
   private radius = DEFAULT_RADIUS;
   private wantsOpen = false;
+  /** Set once the toast opened while `keepExpanded` is on, so it stays open. */
+  private kept = false;
   private active = true;
   private hovered = false;
   private focused = false;
@@ -568,6 +570,7 @@ export class ToastView {
       !this.pending;
     const opening = open && !this.isOpen;
     this.isOpen = open;
+    if (open && this.keepExpanded) this.kept = true;
 
     this.element.dataset.open = String(open);
     this.body.inert = !open;
@@ -618,10 +621,15 @@ export class ToastView {
     clearTimeout(this.closeTimer);
   }
 
+  private get keepExpanded(): boolean {
+    return this.options.keepExpanded === true;
+  }
+
   private restartAutopilot(): void {
     clearTimeout(this.openTimer);
     clearTimeout(this.closeTimer);
-    if (this.engaged) {
+    if (!this.keepExpanded) this.kept = false;
+    if (this.engaged || (this.kept && this.hasBody)) {
       this.wantsOpen = true;
       return;
     }
@@ -639,7 +647,8 @@ export class ToastView {
       this.wantsOpen = true;
       this.layout();
     }, delay);
-    if (hold !== null && hold > 0) {
+    // `setTimeout` fires at once for `Infinity`, so a non-finite hold means stay open.
+    if (!this.keepExpanded && hold !== null && hold > 0 && Number.isFinite(hold)) {
       this.closeTimer = setTimeout(() => {
         if (this.engaged) return;
         this.wantsOpen = false;
@@ -742,7 +751,7 @@ export class ToastView {
 
   private disengage(): void {
     if (this.engaged) return;
-    this.wantsOpen = false;
+    if (!this.kept) this.wantsOpen = false;
     this.ctx.interact(this, false);
     this.layout();
   }
