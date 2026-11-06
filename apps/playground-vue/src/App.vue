@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { type Position, seintje, type Theme, Toaster, useSeintje } from "@seintje/vue";
-import { h, ref } from "vue";
+import { computed, h, ref } from "vue";
 import Greeting from "./Greeting.vue";
 
 const position = ref<Position>("bottom-right");
 const theme = ref<Theme>("system");
 const limit = ref(5);
+const keepExpanded = ref(false);
+// Computed so the toaster only sees new defaults when the checkbox changes.
+const defaults = computed(() => ({ keepExpanded: keepExpanded.value }));
 const { toasts } = useSeintje();
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -19,6 +22,12 @@ const demos = {
       description: h("span", ["Made with ", h("code", "h()"), " in Vue."]),
     }),
   component: () => seintje.show({ title: "Component", description: Greeting }),
+  keepExpanded: () =>
+    seintje.info({
+      title: "Release notes",
+      description: "This toast stays open once it has expanded.",
+      keepExpanded: true,
+    }),
   promise: () =>
     seintje
       .promise(wait(1500), {
@@ -58,9 +67,10 @@ const demos = {
         <option v-for="value in [1, 3, 5, 10]" :key="value" :value="value">limit {{ value }}</option>
         <option :value="Infinity">no limit</option>
       </select>
+      <label><input v-model="keepExpanded" type="checkbox" /> keep expanded</label>
     </div>
   </main>
-  <Toaster :position="position" :theme="theme" :limit="limit" />
+  <Toaster :position="position" :theme="theme" :limit="limit" :defaults="defaults" />
 </template>
 
 <style>
@@ -69,5 +79,6 @@ body { margin: 0; background: light-dark(#f7f7f8, #111113); color: light-dark(#1
 main { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
 h1 small { font-weight: 400; opacity: 0.5; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+label { display: flex; gap: 6px; align-items: center; }
 button, select { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid light-dark(#ccc, #444); background: light-dark(#fff, #1c1c1f); color: inherit; cursor: pointer; }
 </style>

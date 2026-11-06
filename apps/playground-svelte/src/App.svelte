@@ -5,6 +5,8 @@ import Greeting from "./Greeting.svelte";
 let position: Position = $state("bottom-right");
 let theme: Theme = $state("system");
 let limit = $state(5);
+let keepExpanded = $state(false);
+const defaults = $derived({ keepExpanded });
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -16,6 +18,12 @@ const demos: Record<string, () => unknown> = {
     seintje.show({
       title: "Component",
       description: { component: Greeting, props: { name: "Grace" } },
+    }),
+  keepExpanded: () =>
+    seintje.info({
+      title: "Release notes",
+      description: "This toast stays open once it has expanded.",
+      keepExpanded: true,
     }),
   promise: () =>
     seintje
@@ -68,10 +76,11 @@ const demos: Record<string, () => unknown> = {
       {/each}
       <option value={Infinity}>no limit</option>
     </select>
+    <label><input type="checkbox" bind:checked={keepExpanded} /> keep expanded</label>
   </div>
 </main>
 
-<Toaster {position} {theme} {limit} />
+<Toaster {position} {theme} {limit} {defaults} />
 
 <style>
   :global(:root) { color-scheme: light dark; font-family: system-ui, sans-serif; }
@@ -79,5 +88,6 @@ const demos: Record<string, () => unknown> = {
   main { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
   h1 small { font-weight: 400; opacity: 0.5; }
   .row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  label { display: flex; gap: 6px; align-items: center; }
   button, select { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid light-dark(#ccc, #444); background: light-dark(#fff, #1c1c1f); color: inherit; cursor: pointer; }
 </style>

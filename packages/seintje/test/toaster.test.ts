@@ -420,6 +420,48 @@ describe("expanding", () => {
     expect(host.querySelector("[data-seintje-icon]")?.textContent).toBe("🚀");
   });
 
+  test("collapses again once hold runs out", async () => {
+    const { api } = setup({ defaults: { autoExpand: { delay: 0, hold: 20 } } });
+    api.show({ title: "a", description: "first", duration: null });
+    await flush(10);
+    expect(toasts()[0]?.dataset.open).toBe("true");
+    await flush(30);
+    expect(toasts()[0]?.dataset.open).toBe("false");
+  });
+
+  test("keepExpanded stays open after hold runs out", async () => {
+    const { api } = setup({ defaults: { autoExpand: { delay: 0, hold: 20 } } });
+    api.show({ title: "a", description: "first", duration: null, keepExpanded: true });
+    await flush(50);
+    expect(toasts()[0]?.dataset.open).toBe("true");
+  });
+
+  test("keepExpanded stays open when the pointer leaves", () => {
+    const { api } = setup({ defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first", keepExpanded: true });
+    const toast = toasts()[0] as HTMLElement;
+    toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    expect(toast.dataset.open).toBe("true");
+    toast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    expect(toast.dataset.open).toBe("true");
+  });
+
+  test("without keepExpanded, leaving collapses the toast", () => {
+    const { api } = setup({ defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first" });
+    const toast = toasts()[0] as HTMLElement;
+    toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    toast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    expect(toast.dataset.open).toBe("false");
+  });
+
+  test("an infinite hold keeps the toast open", async () => {
+    const { api } = setup({ defaults: { autoExpand: { delay: 0, hold: Infinity } } });
+    api.show({ title: "a", description: "first", duration: null });
+    await flush(20);
+    expect(toasts()[0]?.dataset.open).toBe("true");
+  });
+
   test("loading toasts never open", async () => {
     const { api } = setup({ defaults: { autoExpand: { delay: 0 } } });
     api.loading({ title: "Busy", description: "hidden" });

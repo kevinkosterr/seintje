@@ -88,6 +88,11 @@ export interface ToastOptions {
   dismissible?: boolean;
   /** Open the description automatically. Defaults to `true`. */
   autoExpand?: boolean | AutoExpandOptions;
+  /**
+   * Once open, stay open instead of collapsing again when `hold` runs out or
+   * the pointer or focus leaves. Defaults to `false`.
+   */
+  keepExpanded?: boolean;
   /** Background colour of the toast shape. */
   fill?: string;
   /** Corner radius in pixels. Defaults to `--seintje-radius`, else 18. */
