@@ -10,6 +10,7 @@ export {
   type Position,
   type Store,
   type Theme,
+  type TitlePosition,
   type ToastAction,
   type ToastClasses,
   type ToastRecord,
