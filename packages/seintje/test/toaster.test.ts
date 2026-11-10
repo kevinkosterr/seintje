@@ -134,11 +134,11 @@ describe("rendering", () => {
 });
 
 describe("title position", () => {
-  test("follows the position by default", () => {
+  test("sits at the top by default, at any position", () => {
     const { api } = setup({ position: "bottom-right" });
     api.show({ title: "Bottom" });
     api.show({ title: "Top", position: "top-left" });
-    expect(toasts().map((toast) => toast.dataset.title)).toEqual(["bottom", "top"]);
+    expect(toasts().map((toast) => toast.dataset.title)).toEqual(["top", "top"]);
   });
 
   test("can sit on top of the description at a bottom position", () => {

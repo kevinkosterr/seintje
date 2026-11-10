@@ -387,8 +387,7 @@ export class ToastView {
     const classes = options.classes ?? {};
 
     this.element.dataset.type = type;
-    this.element.dataset.title =
-      options.titlePosition ?? (this.ctx.grow === "down" ? "top" : "bottom");
+    this.element.dataset.title = options.titlePosition ?? "top";
     this.element.className = classList(options.className, classes.toast);
     this.element.setAttribute("aria-busy", type === "loading" ? "true" : "false");
     if (options.fill) this.element.style.setProperty("--seintje-fill", options.fill);

@@ -80,11 +80,7 @@ export interface ToastOptions {
    */
   icon?: Content | null;
   position?: Position;
-  /**
-   * Where the title sits relative to the description. Defaults to the
-   * vertical edge of `position`: `"top"` for top positions, `"bottom"` for
-   * bottom positions.
-   */
+  /** Where the title sits relative to the description. Defaults to `"top"`. */
   titlePosition?: TitlePosition;
   /** Milliseconds before auto-dismissal. `null` or `Infinity` keeps it open. */
   duration?: number | null;
