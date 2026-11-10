@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.2](https://github.com/kevinkosterr/seintje/compare/svelte-v0.1.1...svelte-v0.1.2) (2026-11-10)
+
+
+### Features
+
+* **seintje:** add titlePosition option ([c235183](https://github.com/kevinkosterr/seintje/commit/c235183c1f23e40eeaf965ad9476ce9b55a91d78))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * seintje bumped to 0.1.2
+
 ## [0.1.1](https://github.com/kevinkosterr/seintje/compare/svelte-v0.1.0...svelte-v0.1.1) (2026-11-02)
 
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.2](https://github.com/kevinkosterr/seintje/compare/seintje-v0.1.1...seintje-v0.1.2) (2026-11-10)
+
+
+### Features
+
+* **seintje:** add keepExpanded option ([c827f42](https://github.com/kevinkosterr/seintje/commit/c827f422871090526082fb4b606214d639a85231))
+* **seintje:** add keepExpanded option ([2ffcd7e](https://github.com/kevinkosterr/seintje/commit/2ffcd7e5b32b79b38e82a7236962703a2716e2d7))
+* **seintje:** add titlePosition option ([c235183](https://github.com/kevinkosterr/seintje/commit/c235183c1f23e40eeaf965ad9476ce9b55a91d78))
+
+
+### Bug Fixes
+
+* **seintje:** keep close button in the top-right corner ([abb0754](https://github.com/kevinkosterr/seintje/commit/abb0754a34247240b998534052e43ce7558b3dce))
+* **seintje:** keep close button in the top-right corner ([864d76c](https://github.com/kevinkosterr/seintje/commit/864d76cc236991cd880921b8f886ef410fb0ecec))
+
 ## [0.1.1](https://github.com/kevinkosterr/seintje/compare/seintje-v0.1.0...seintje-v0.1.1) (2026-11-02)
 
 
