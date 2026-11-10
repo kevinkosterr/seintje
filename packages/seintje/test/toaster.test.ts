@@ -476,6 +476,29 @@ describe("expanding", () => {
     expect(toast.dataset.open).toBe("true");
   });
 
+  test("every keepExpanded toast in a stack opens", async () => {
+    const { api } = setup({ defaults: { autoExpand: { delay: 0 } } });
+    api.show({ title: "a", description: "first", duration: null, keepExpanded: true });
+    api.show({ title: "b", description: "second", duration: null, keepExpanded: true });
+    await flush(20);
+    expect(toasts().map((toast) => toast.dataset.open)).toEqual(["true", "true"]);
+  });
+
+  test("keepExpanded stays open while another toast is hovered", async () => {
+    const { api } = setup({ defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first", keepExpanded: true });
+    api.show({ title: "b", description: "second" });
+    const [kept, other] = toasts() as [HTMLElement, HTMLElement];
+    const keptToast = kept.textContent?.includes("first") ? kept : other;
+    const otherToast = keptToast === kept ? other : kept;
+    keptToast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    keptToast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    await flush(LEAVE_GRACE_MS + 20);
+    otherToast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    expect(keptToast.dataset.open).toBe("true");
+    expect(otherToast.dataset.open).toBe("true");
+  });
+
   test("without keepExpanded, leaving collapses the toast after a grace period", async () => {
     const { api } = setup({ defaults: { autoExpand: false } });
     api.show({ title: "a", description: "first" });

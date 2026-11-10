@@ -329,7 +329,7 @@ export class ToastView {
     this.render(this.pending ?? this.record, true);
   }
 
-  /** Only the active toast of a stack may open. */
+  /** Only the active toast of a stack may open, unless it keeps expanded. */
   setActive(active: boolean): void {
     if (this.active === active) return;
     this.active = active;
@@ -576,7 +576,8 @@ export class ToastView {
     const { motion, align } = this.ctx;
     const open =
       !this.closing &&
-      this.active &&
+      // A stack opens one toast at a time, except those that keep expanded.
+      (this.active || this.keepExpanded) &&
       this.wantsOpen &&
       this.hasBody &&
       this.record.type !== "loading" &&
