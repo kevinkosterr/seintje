@@ -1,6 +1,6 @@
 {
   "name": "@seintje/svelte",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Svelte 5 bindings for Seintje toast notifications.",
   "license": "MIT",
   "type": "module",
