@@ -547,11 +547,13 @@ export class ToastView {
     this.body.style.clipPath = `inset(0 ${right}px ${hidden}px ${Math.max(0, x)}px)`;
     // The header hugs its text, so the close button rides the pill's right
     // edge to stay in the card's corner while the pill is wider than that.
-    // Growing upwards the header is at the bottom, so it also climbs over
-    // the body to the top edge.
+    // With the title at the bottom it also climbs over the body to the top
+    // edge. With the title at the top it is already there.
     const shiftX = Math.max(0, width - this.headWidth);
     const shiftY =
-      this.ctx.grow === "up" ? Math.max(0, channels.height.current - this.headHeight) : 0;
+      this.element.dataset.title === "bottom"
+        ? Math.max(0, channels.height.current - this.headHeight)
+        : 0;
     this.closeButton.style.transform =
       shiftX > 0 || shiftY > 0 ? `translate(${shiftX}px, ${-shiftY}px)` : "";
   }

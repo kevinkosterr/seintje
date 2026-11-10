@@ -476,6 +476,18 @@ describe("expanding", () => {
     expect(toast.dataset.open).toBe("true");
   });
 
+  test("the close button only climbs when the title is at the bottom", () => {
+    const { api } = setup({ position: "bottom-right", defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first", titlePosition: "top" });
+    api.show({ title: "b", description: "second", titlePosition: "bottom" });
+    for (const toast of toasts()) {
+      toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+      const close = toast.querySelector<HTMLElement>("[data-seintje-close]");
+      const climbs = /translate\([^,]+, -[1-9]/.test(close?.style.transform ?? "");
+      expect(climbs).toBe(toast.dataset.title === "bottom");
+    }
+  });
+
   test("every keepExpanded toast in a stack opens", async () => {
     const { api } = setup({ defaults: { autoExpand: { delay: 0 } } });
     api.show({ title: "a", description: "first", duration: null, keepExpanded: true });
