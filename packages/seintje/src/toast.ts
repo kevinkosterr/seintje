@@ -12,6 +12,7 @@ import {
   DEFAULT_DURATION,
   DEFAULT_RADIUS,
   HEAD_HEIGHT,
+  LEAVE_GRACE_MS,
   MIN_BODY_HEIGHT,
   STACK_GAP,
   SWAP_MS,
@@ -152,6 +153,7 @@ export class ToastView {
   private swapTimer: ReturnType<typeof setTimeout> | undefined;
   private openTimer: ReturnType<typeof setTimeout> | undefined;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
+  private leaveTimer: ReturnType<typeof setTimeout> | undefined;
   private resizeObserver: ResizeObserver | undefined;
   private swipeStart: { x: number; y: number; time: number } | undefined;
   /** Mouse and pen swipes are vertical only; touch picks an axis once it moves far enough. */
@@ -630,6 +632,7 @@ export class ToastView {
     clearTimeout(this.swapTimer);
     clearTimeout(this.openTimer);
     clearTimeout(this.closeTimer);
+    clearTimeout(this.leaveTimer);
   }
 
   private get keepExpanded(): boolean {
@@ -708,13 +711,18 @@ export class ToastView {
 
     element.addEventListener("pointerenter", (event) => {
       if (event.pointerType === "touch" || this.closing) return;
+      clearTimeout(this.leaveTimer);
+      if (this.hovered) return;
       this.hovered = true;
       this.engage();
     });
     element.addEventListener("pointerleave", (event) => {
       if (event.pointerType === "touch" || !this.hovered) return;
-      this.hovered = false;
-      this.disengage();
+      clearTimeout(this.leaveTimer);
+      this.leaveTimer = setTimeout(() => {
+        this.hovered = false;
+        this.disengage();
+      }, LEAVE_GRACE_MS);
     });
     element.addEventListener("focusin", () => {
       if (this.focused || this.closing) return;

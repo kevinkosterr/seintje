@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { createApi } from "../src/api";
-import { HEAD_HEIGHT, TOAST_WIDTH } from "../src/constants";
+import { HEAD_HEIGHT, LEAVE_GRACE_MS, TOAST_WIDTH } from "../src/constants";
 import { createStore } from "../src/store";
 import { createToaster, type Toaster } from "../src/toaster";
 
@@ -476,13 +476,27 @@ describe("expanding", () => {
     expect(toast.dataset.open).toBe("true");
   });
 
-  test("without keepExpanded, leaving collapses the toast", () => {
+  test("without keepExpanded, leaving collapses the toast after a grace period", async () => {
     const { api } = setup({ defaults: { autoExpand: false } });
     api.show({ title: "a", description: "first" });
     const toast = toasts()[0] as HTMLElement;
     toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
     toast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    expect(toast.dataset.open).toBe("true");
+    await flush(LEAVE_GRACE_MS + 20);
     expect(toast.dataset.open).toBe("false");
+  });
+
+  test("coming back within the grace period keeps the toast open", async () => {
+    const { api } = setup({ defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first" });
+    const toast = toasts()[0] as HTMLElement;
+    toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    toast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    await flush(LEAVE_GRACE_MS / 2);
+    toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    await flush(LEAVE_GRACE_MS + 20);
+    expect(toast.dataset.open).toBe("true");
   });
 
   test("an infinite hold keeps the toast open", async () => {
