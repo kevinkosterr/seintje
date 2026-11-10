@@ -17,6 +17,12 @@ export const EXIT_MS = 450;
 export const AUTO_OPEN_DELAY = 220;
 /** By default the toast closes this long before it is dismissed. */
 export const AUTO_CLOSE_LEAD = 1500;
+/**
+ * How long the pointer may be off the toast before it collapses. While the
+ * toast opens its edges and close button move, so a quick pointer can slip
+ * past the growing shape.
+ */
+export const LEAVE_GRACE_MS = 200;
 /** Time given to the collapse before swapped-in content is shown. */
 export const SWAP_MS = 240;
 

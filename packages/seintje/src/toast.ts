@@ -12,6 +12,7 @@ import {
   DEFAULT_DURATION,
   DEFAULT_RADIUS,
   HEAD_HEIGHT,
+  LEAVE_GRACE_MS,
   MIN_BODY_HEIGHT,
   STACK_GAP,
   SWAP_MS,
@@ -152,6 +153,7 @@ export class ToastView {
   private swapTimer: ReturnType<typeof setTimeout> | undefined;
   private openTimer: ReturnType<typeof setTimeout> | undefined;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
+  private leaveTimer: ReturnType<typeof setTimeout> | undefined;
   private resizeObserver: ResizeObserver | undefined;
   private swipeStart: { x: number; y: number; time: number } | undefined;
   /** Mouse and pen swipes are vertical only; touch picks an axis once it moves far enough. */
@@ -327,7 +329,7 @@ export class ToastView {
     this.render(this.pending ?? this.record, true);
   }
 
-  /** Only the active toast of a stack may open. */
+  /** Only the active toast of a stack may open, unless it keeps expanded. */
   setActive(active: boolean): void {
     if (this.active === active) return;
     this.active = active;
@@ -385,8 +387,7 @@ export class ToastView {
     const classes = options.classes ?? {};
 
     this.element.dataset.type = type;
-    this.element.dataset.title =
-      options.titlePosition ?? (this.ctx.grow === "down" ? "top" : "bottom");
+    this.element.dataset.title = options.titlePosition ?? "top";
     this.element.className = classList(options.className, classes.toast);
     this.element.setAttribute("aria-busy", type === "loading" ? "true" : "false");
     if (options.fill) this.element.style.setProperty("--seintje-fill", options.fill);
@@ -414,10 +415,15 @@ export class ToastView {
     this.actionButton.textContent = action?.label ?? "";
     this.actionButton.className = classList(classes.action);
     this.actionButton.dataset.type = type;
-    const inline = options.actionPlacement !== "below";
+    // With a description the action sits in the body, under the text, whatever
+    // `actionPlacement` says. Otherwise it goes with the title.
+    const inBody = hasContent(options.description);
+    const inline = !inBody && options.actionPlacement !== "below";
     this.actions.hidden = !action || inline;
     setAttr(this.element, "data-action-visibility", action ? options.actionVisibility : undefined);
-    // Only move the button when the placement changes, so it keeps focus otherwise.
+    // Only move nodes when the placement changes, so the button keeps focus otherwise.
+    const actionsParent = inBody ? this.bodyInner : this.head;
+    if (this.actions.parentElement !== actionsParent) actionsParent.append(this.actions);
     const parent = inline ? this.headRow : this.actions;
     if (this.actionButton.parentElement !== parent) {
       parent.insertBefore(this.actionButton, inline ? this.closeButton : null);
@@ -545,11 +551,13 @@ export class ToastView {
     this.body.style.clipPath = `inset(0 ${right}px ${hidden}px ${Math.max(0, x)}px)`;
     // The header hugs its text, so the close button rides the pill's right
     // edge to stay in the card's corner while the pill is wider than that.
-    // Growing upwards the header is at the bottom, so it also climbs over
-    // the body to the top edge.
+    // With the title at the bottom it also climbs over the body to the top
+    // edge. With the title at the top it is already there.
     const shiftX = Math.max(0, width - this.headWidth);
     const shiftY =
-      this.ctx.grow === "up" ? Math.max(0, channels.height.current - this.headHeight) : 0;
+      this.element.dataset.title === "bottom"
+        ? Math.max(0, channels.height.current - this.headHeight)
+        : 0;
     this.closeButton.style.transform =
       shiftX > 0 || shiftY > 0 ? `translate(${shiftX}px, ${-shiftY}px)` : "";
   }
@@ -574,7 +582,8 @@ export class ToastView {
     const { motion, align } = this.ctx;
     const open =
       !this.closing &&
-      this.active &&
+      // A stack opens one toast at a time, except those that keep expanded.
+      (this.active || this.keepExpanded) &&
       this.wantsOpen &&
       this.hasBody &&
       this.record.type !== "loading" &&
@@ -630,6 +639,7 @@ export class ToastView {
     clearTimeout(this.swapTimer);
     clearTimeout(this.openTimer);
     clearTimeout(this.closeTimer);
+    clearTimeout(this.leaveTimer);
   }
 
   private get keepExpanded(): boolean {
@@ -708,13 +718,18 @@ export class ToastView {
 
     element.addEventListener("pointerenter", (event) => {
       if (event.pointerType === "touch" || this.closing) return;
+      clearTimeout(this.leaveTimer);
+      if (this.hovered) return;
       this.hovered = true;
       this.engage();
     });
     element.addEventListener("pointerleave", (event) => {
       if (event.pointerType === "touch" || !this.hovered) return;
-      this.hovered = false;
-      this.disengage();
+      clearTimeout(this.leaveTimer);
+      this.leaveTimer = setTimeout(() => {
+        this.hovered = false;
+        this.disengage();
+      }, LEAVE_GRACE_MS);
     });
     element.addEventListener("focusin", () => {
       if (this.focused || this.closing) return;

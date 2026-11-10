@@ -183,7 +183,7 @@
   box-sizing: border-box;
   width: max-content;
   max-width: var(--seintje-width, 356px);
-  padding: 0 18px 0 13px;
+  padding: 0 18px 0 9px;
   color: var(--seintje-text);
   pointer-events: auto;
   touch-action: none;
@@ -213,8 +213,14 @@
 /* Under the title, lined up with the title text rather than the icon. */
 [data-seintje-actions] {
   display: flex;
-  padding: 0 0 12px 28px;
+  padding: 0 0 12px 36px;
   margin-top: -4px;
+}
+
+/* In the body, under the description and lined up with it. */
+[data-seintje-body-inner] > [data-seintje-actions] {
+  padding: 0;
+  margin-top: 10px;
 }
 
 [data-seintje-actions][hidden] {
@@ -240,17 +246,22 @@
   pointer-events: none;
 }
 
+/* A tinted disc, concentric with the rounded end of the pill. */
 [data-seintje-icon] {
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 18px;
-  height: 18px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
   color: var(--seintje-tone);
+  background: color-mix(in oklch, var(--seintje-tone) 18%, transparent);
 }
 
 [data-seintje-icon] > svg {
   display: block;
+  width: 16px;
+  height: 16px;
 }
 
 [data-seintje-title] {

@@ -41,9 +41,10 @@ in both themes, set it on both selectors.
 | `--seintje-error` | Tone of `error` toasts | `oklch(0.72 0.18 24)` | `oklch(0.56 0.2 26)` |
 | `--seintje-loading` | Tone of `loading` toasts | `rgb(246 246 247 / 0.7)` | `rgb(24 24 27 / 0.62)` |
 
-The tone colours the icon, the title and the action button, whose background is the tone mixed
-with transparency. Each toast copies the tone of its type into `--seintje-tone`, which you can
-also set directly on a toast, for example through its `className`:
+The tone colours the icon, the title and the action button. The icon's round background and the
+action button's background are the tone mixed with transparency. Each toast copies the tone of its
+type into `--seintje-tone`, which you can also set directly on a toast, for example through its
+`className`:
 
 ```css
 [data-seintje] [data-seintje-toast].billing {
@@ -179,7 +180,9 @@ section[data-seintje][data-theme]
          │  └─ div[data-seintje-actions]
          │        └─ button[data-seintje-action]   (actionPlacement: "below")
          └─ div[data-seintje-body] › div[data-seintje-body-inner]
-               └─ div[data-seintje-description]
+               ├─ div[data-seintje-description]
+               └─ div[data-seintje-actions]   (moved here when there is a description)
+                     └─ button[data-seintje-action]
 ```
 
 The state attributes you can style:

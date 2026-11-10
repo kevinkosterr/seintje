@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { createApi } from "../src/api";
-import { HEAD_HEIGHT, TOAST_WIDTH } from "../src/constants";
+import { HEAD_HEIGHT, LEAVE_GRACE_MS, TOAST_WIDTH } from "../src/constants";
 import { createStore } from "../src/store";
 import { createToaster, type Toaster } from "../src/toaster";
 
@@ -134,11 +134,11 @@ describe("rendering", () => {
 });
 
 describe("title position", () => {
-  test("follows the position by default", () => {
+  test("sits at the top by default, at any position", () => {
     const { api } = setup({ position: "bottom-right" });
     api.show({ title: "Bottom" });
     api.show({ title: "Top", position: "top-left" });
-    expect(toasts().map((toast) => toast.dataset.title)).toEqual(["bottom", "top"]);
+    expect(toasts().map((toast) => toast.dataset.title)).toEqual(["top", "top"]);
   });
 
   test("can sit on top of the description at a bottom position", () => {
@@ -286,6 +286,30 @@ describe("keyboard", () => {
     expect(below?.parentElement?.hasAttribute("data-seintje-actions")).toBe(true);
     expect(below?.closest("[data-seintje-head]")).not.toBeNull();
     expect(inline?.parentElement?.hasAttribute("data-seintje-head-row")).toBe(true);
+  });
+
+  test("with a description the action sits in the body, whatever the placement", () => {
+    const { api } = setup();
+    const id = api.show({
+      title: "a",
+      description: "text",
+      action: { label: "Do", onClick: () => {} },
+    });
+    api.show({
+      title: "b",
+      description: "text",
+      action: { label: "Do", onClick: () => {} },
+      actionPlacement: "below",
+    });
+    for (const button of host.querySelectorAll<HTMLButtonElement>("[data-seintje-action]")) {
+      expect(button.closest("[data-seintje-body]")).not.toBeNull();
+      expect(button.closest("[data-seintje-head]")).toBeNull();
+    }
+    // Losing the description moves it back to the title.
+    api.show({ id, title: "a", action: { label: "Do", onClick: () => {} } });
+    expect(host.querySelectorAll("[data-seintje-head-row] > [data-seintje-action]")).toHaveLength(
+      1,
+    );
   });
 
   test("an action without a description leaves no body to open", () => {
@@ -476,13 +500,62 @@ describe("expanding", () => {
     expect(toast.dataset.open).toBe("true");
   });
 
-  test("without keepExpanded, leaving collapses the toast", () => {
+  test("the close button only climbs when the title is at the bottom", () => {
+    const { api } = setup({ position: "bottom-right", defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first", titlePosition: "top" });
+    api.show({ title: "b", description: "second", titlePosition: "bottom" });
+    for (const toast of toasts()) {
+      toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+      const close = toast.querySelector<HTMLElement>("[data-seintje-close]");
+      const climbs = /translate\([^,]+, -[1-9]/.test(close?.style.transform ?? "");
+      expect(climbs).toBe(toast.dataset.title === "bottom");
+    }
+  });
+
+  test("every keepExpanded toast in a stack opens", async () => {
+    const { api } = setup({ defaults: { autoExpand: { delay: 0 } } });
+    api.show({ title: "a", description: "first", duration: null, keepExpanded: true });
+    api.show({ title: "b", description: "second", duration: null, keepExpanded: true });
+    await flush(20);
+    expect(toasts().map((toast) => toast.dataset.open)).toEqual(["true", "true"]);
+  });
+
+  test("keepExpanded stays open while another toast is hovered", async () => {
+    const { api } = setup({ defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first", keepExpanded: true });
+    api.show({ title: "b", description: "second" });
+    const [kept, other] = toasts() as [HTMLElement, HTMLElement];
+    const keptToast = kept.textContent?.includes("first") ? kept : other;
+    const otherToast = keptToast === kept ? other : kept;
+    keptToast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    keptToast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    await flush(LEAVE_GRACE_MS + 20);
+    otherToast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    expect(keptToast.dataset.open).toBe("true");
+    expect(otherToast.dataset.open).toBe("true");
+  });
+
+  test("without keepExpanded, leaving collapses the toast after a grace period", async () => {
     const { api } = setup({ defaults: { autoExpand: false } });
     api.show({ title: "a", description: "first" });
     const toast = toasts()[0] as HTMLElement;
     toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
     toast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    expect(toast.dataset.open).toBe("true");
+    await flush(LEAVE_GRACE_MS + 20);
     expect(toast.dataset.open).toBe("false");
+  });
+
+  test("coming back within the grace period keeps the toast open", async () => {
+    const { api } = setup({ defaults: { autoExpand: false } });
+    api.show({ title: "a", description: "first" });
+    const toast = toasts()[0] as HTMLElement;
+    toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    toast.dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }));
+    await flush(LEAVE_GRACE_MS / 2);
+    toast.dispatchEvent(new PointerEvent("pointerenter", { pointerType: "mouse" }));
+    await flush(LEAVE_GRACE_MS + 20);
+    expect(toast.dataset.open).toBe("true");
   });
 
   test("an infinite hold keeps the toast open", async () => {

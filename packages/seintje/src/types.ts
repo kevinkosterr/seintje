@@ -80,16 +80,15 @@ export interface ToastOptions {
    */
   icon?: Content | null;
   position?: Position;
-  /**
-   * Where the title sits relative to the description. Defaults to the
-   * vertical edge of `position`: `"top"` for top positions, `"bottom"` for
-   * bottom positions.
-   */
+  /** Where the title sits relative to the description. Defaults to `"top"`. */
   titlePosition?: TitlePosition;
   /** Milliseconds before auto-dismissal. `null` or `Infinity` keeps it open. */
   duration?: number | null;
   action?: ToastAction;
-  /** Where the action button sits. Defaults to `"inline"`. */
+  /**
+   * Where the action button sits next to the title. Defaults to `"inline"`.
+   * With a description the action always sits in the body, under the text.
+   */
   actionPlacement?: ActionPlacement;
   /** When the action button is shown. Defaults to `"always"`. */
   actionVisibility?: ActionVisibility;

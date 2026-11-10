@@ -11,14 +11,14 @@ description: Everything a single toast can be configured with.
 | `type` | `"neutral" \| "success" \| "info" \| "warning" \| "error" \| "loading"` | set by the method | Icon and tone. |
 | `icon` | `Content \| null` | built-in icon of the type | A string starting with `<svg` is rendered as inline SVG. `null` hides the icon. |
 | `position` | `Position` | the toaster's | One of `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, `bottom-right`. |
-| `titlePosition` | `"top" \| "bottom"` | from `position` | Puts the title above or below the description. By default it sits at the toast's screen edge: on top for top positions, at the bottom for bottom positions. |
+| `titlePosition` | `"top" \| "bottom"` | `"top"` | Puts the title above or below the description, at any position. |
 | `duration` | `number \| null` | `5000`, `null` for loading toasts | Milliseconds until it is dismissed. `null` or `Infinity` keeps it. |
 | `action` | `{ label, onClick, dismiss? }` | — | A button shown with the title. `onClick(event, toast)` gets `{ id, dismiss }`. Set `dismiss: true` to close the toast after the click. |
-| `actionPlacement` | `"inline" \| "below"` | `"inline"` | `inline` puts the action right next to the title, `below` underneath it. |
+| `actionPlacement` | `"inline" \| "below"` | `"inline"` | `inline` puts the action right next to the title, `below` underneath it. With a `description`, the action always sits in the body, under the text. |
 | `actionVisibility` | `"always" \| "hover"` | `"always"` | `hover` only shows the action while the toast is hovered or focused. |
 | `dismissible` | `boolean` | `true` | Allows swipe, the close button and Escape. |
 | `autoExpand` | `boolean \| { delay?, hold? }` | `true` | Opens the body by itself when there is a description. `delay` is the wait before opening (default `220`); `hold` how long it stays open (default: until 1.5 s before it is dismissed, or for good when it has no duration). |
-| `keepExpanded` | `boolean` | `false` | Once the body has opened, by itself or on hover or focus, it stays open instead of collapsing when `hold` runs out or the pointer or focus leaves. |
+| `keepExpanded` | `boolean` | `false` | Once the body has opened, by itself or on hover or focus, it stays open instead of collapsing when `hold` runs out, the pointer or focus leaves, or another toast in the stack opens. |
 | `fill` | `string` | theme | Background colour of the shape. |
 | `radius` | `number` | `--seintje-radius`, else `18` | Corner radius in pixels. |
 | `important` | `boolean` | `true` for errors | Announce through the assertive live region. |
