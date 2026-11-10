@@ -128,7 +128,7 @@
   inset: 0;
 }
 
-/* The shape. Growing upwards mirrors the canvas so the body sits above the pill. */
+/* The shape. A title at the bottom mirrors the canvas so the body sits above the pill. */
 
 /* Open, the whole title bar is a hover target, not just the header text. */
 [data-seintje-toast][data-open="true"] [data-seintje-card]::before {
@@ -141,7 +141,7 @@
   pointer-events: auto;
 }
 
-[data-seintje-toast][data-open="true"][data-grow="up"] [data-seintje-card]::before {
+[data-seintje-toast][data-open="true"][data-title="bottom"] [data-seintje-card]::before {
   top: auto;
   bottom: 0;
 }
@@ -154,7 +154,7 @@
   pointer-events: none;
 }
 
-[data-seintje-toast][data-grow="up"] [data-seintje-surface] {
+[data-seintje-toast][data-title="bottom"] [data-seintje-surface] {
   top: auto;
   bottom: 0;
   transform: scaleY(-1);
@@ -189,7 +189,7 @@
   -webkit-user-select: none;
 }
 
-[data-seintje-toast][data-grow="up"] [data-seintje-head] {
+[data-seintje-toast][data-title="bottom"] [data-seintje-head] {
   top: auto;
   bottom: 0;
 }
@@ -304,7 +304,7 @@
   pointer-events: none;
 }
 
-[data-seintje-toast][data-grow="up"] [data-seintje-body] {
+[data-seintje-toast][data-title="bottom"] [data-seintje-body] {
   top: 0;
 }
 
@@ -323,8 +323,8 @@
   overflow-wrap: anywhere;
 }
 
-/* Growing upwards, the title bar sits below the text. */
-[data-seintje-toast][data-grow="up"] [data-seintje-body-inner] {
+/* With the title at the bottom, the title bar sits below the text. */
+[data-seintje-toast][data-title="bottom"] [data-seintje-body-inner] {
   padding: 16px 18px 6px 14px;
 }
 

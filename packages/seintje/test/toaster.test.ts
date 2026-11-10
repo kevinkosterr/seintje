@@ -133,6 +133,36 @@ describe("rendering", () => {
   });
 });
 
+describe("title position", () => {
+  test("follows the position by default", () => {
+    const { api } = setup({ position: "bottom-right" });
+    api.show({ title: "Bottom" });
+    api.show({ title: "Top", position: "top-left" });
+    expect(toasts().map((toast) => toast.dataset.title)).toEqual(["bottom", "top"]);
+  });
+
+  test("can sit on top of the description at a bottom position", () => {
+    const { api } = setup({ position: "bottom-right" });
+    api.show({ title: "a", description: "b", titlePosition: "top" });
+    const toast = toasts()[0] as HTMLElement;
+    expect(toast.dataset.title).toBe("top");
+    expect(toast.dataset.grow).toBe("up");
+  });
+
+  test("can sit below the description at a top position", () => {
+    const { api } = setup({ position: "top-center", defaults: { titlePosition: "bottom" } });
+    api.show({ title: "a", description: "b" });
+    expect(toasts()[0]?.dataset.title).toBe("bottom");
+  });
+
+  test("updates with the toast", () => {
+    const { api } = setup();
+    const id = api.show({ title: "a", titlePosition: "top" });
+    api.show({ id, title: "a", titlePosition: "bottom" });
+    expect(toasts()[0]?.dataset.title).toBe("bottom");
+  });
+});
+
 describe("accessibility", () => {
   test("has no interactive element nested in another", () => {
     const { api } = setup();

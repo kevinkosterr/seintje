@@ -30,6 +30,7 @@ export {
   POSITIONS,
   type Position,
   type Theme,
+  type TitlePosition,
   type ToastAction,
   type ToastClasses,
   type ToastHandle,

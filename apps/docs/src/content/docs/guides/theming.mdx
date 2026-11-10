@@ -166,7 +166,7 @@ Every part has a `data-seintje-*` attribute you can target:
 ```
 section[data-seintje][data-theme]
 └─ ol[data-seintje-viewport][data-position]
-   └─ li[data-seintje-toast][data-type][data-open][data-grow][data-align]
+   └─ li[data-seintje-toast][data-type][data-open][data-grow][data-title][data-align]
       └─ div[data-seintje-card]
          ├─ div[data-seintje-surface] › svg[data-seintje-canvas]
          ├─ div[data-seintje-head]
@@ -191,6 +191,7 @@ The state attributes you can style:
 | `data-type` | toast, heading, action | the toast type |
 | `data-open` | toast | `true` while the description is showing, else `false` |
 | `data-grow` | toast | `down` for top positions, `up` for bottom positions |
+| `data-title` | toast | `top` or `bottom`, from `titlePosition` |
 | `data-align` | toast | `start`, `center` or `end`, from the position |
 | `data-action-visibility` | toast | `always` or `hover`, when the toast has an action |
 | `data-swiping` | toast | present while the toast is dragged |

@@ -50,6 +50,9 @@ export type ActionPlacement = "inline" | "below";
 /** Whether the action button is always shown, or only while the toast is hovered or focused. */
 export type ActionVisibility = "always" | "hover";
 
+/** Whether the title sits above or below the description. */
+export type TitlePosition = "top" | "bottom";
+
 export interface ToastClasses {
   toast?: string;
   title?: string;
@@ -77,6 +80,12 @@ export interface ToastOptions {
    */
   icon?: Content | null;
   position?: Position;
+  /**
+   * Where the title sits relative to the description. Defaults to the
+   * vertical edge of `position`: `"top"` for top positions, `"bottom"` for
+   * bottom positions.
+   */
+  titlePosition?: TitlePosition;
   /** Milliseconds before auto-dismissal. `null` or `Infinity` keeps it open. */
   duration?: number | null;
   action?: ToastAction;

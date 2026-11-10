@@ -1,4 +1,11 @@
-import { createToaster, type MotionPreference, type Position, seintje, type Theme } from "seintje";
+import {
+  createToaster,
+  type MotionPreference,
+  type Position,
+  seintje,
+  type Theme,
+  type TitlePosition,
+} from "seintje";
 import "seintje/styles.css";
 
 const toaster = createToaster(document.body, { position: "bottom-right" });
@@ -99,8 +106,15 @@ select("limit").addEventListener("change", (e) =>
 );
 
 const keepExpanded = document.getElementById("keep-expanded") as HTMLInputElement;
-keepExpanded.addEventListener("change", () =>
-  toaster.update({ defaults: { keepExpanded: keepExpanded.checked } }),
-);
+const titlePosition = select("title-position");
+const updateDefaults = () =>
+  toaster.update({
+    defaults: {
+      keepExpanded: keepExpanded.checked,
+      titlePosition: (titlePosition.value || undefined) as TitlePosition | undefined,
+    },
+  });
+keepExpanded.addEventListener("change", updateDefaults);
+titlePosition.addEventListener("change", updateDefaults);
 
 Object.assign(window, { seintje, toaster });
