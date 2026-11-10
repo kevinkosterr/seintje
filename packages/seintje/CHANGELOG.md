@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.3](https://github.com/kevinkosterr/seintje/compare/seintje-v0.1.2...seintje-v0.1.3) (2026-11-10)
+
+
+### Features
+
+* **seintje:** give icons a tinted round background ([05ee89c](https://github.com/kevinkosterr/seintje/commit/05ee89c75d1fb9fe97854b6720083c4591d347e0))
+* **seintje:** place the title at the top by default ([6989337](https://github.com/kevinkosterr/seintje/commit/698933769e48dc5bb0200f99447f4ecd0077fb58))
+* **seintje:** show the action in the body when there is a description ([fb0ec2d](https://github.com/kevinkosterr/seintje/commit/fb0ec2d33c981334649f16dcaae746c6bab779c8))
+
+
+### Bug Fixes
+
+* **seintje:** keep every keepExpanded toast open ([db1a23a](https://github.com/kevinkosterr/seintje/commit/db1a23a551e0c36adff9b05826b7d2c7b07480d4))
+* **seintje:** only lift the close button when the title is at the bottom ([b8cd9ef](https://github.com/kevinkosterr/seintje/commit/b8cd9ef5c3ed50c53caf1c9246cb2a3baae2dde2))
+* **seintje:** wait briefly before collapsing when the pointer leaves ([1555806](https://github.com/kevinkosterr/seintje/commit/15558065ebb4150713ac3920f6994ec3c56b188b))
+
 ## [0.1.2](https://github.com/kevinkosterr/seintje/compare/seintje-v0.1.1...seintje-v0.1.2) (2026-11-10)
 
 

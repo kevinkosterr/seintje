@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.3](https://github.com/kevinkosterr/seintje/compare/svelte-v0.1.2...svelte-v0.1.3) (2026-11-10)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * seintje bumped to 0.1.3
+
 ## [0.1.2](https://github.com/kevinkosterr/seintje/compare/svelte-v0.1.1...svelte-v0.1.2) (2026-11-10)
 
 
