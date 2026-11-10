@@ -176,6 +176,8 @@
   position: absolute;
   top: 0;
   left: 0;
+  /* Above the body, which the close button crosses when the toast grows upwards. */
+  z-index: 1;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -326,6 +328,12 @@
 /* Growing upwards, the title bar sits below the text. */
 [data-seintje-toast][data-grow="up"] [data-seintje-body-inner] {
   padding: 16px 18px 6px 14px;
+}
+
+/* The close button then sits in the text's top-right corner, so keep that clear. */
+[data-seintje-toast][data-grow="up"]:has([data-seintje-close]:not([hidden]))
+  [data-seintje-body-inner] {
+  padding-right: 38px;
 }
 
 [data-seintje-action] {
