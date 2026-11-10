@@ -14,7 +14,7 @@ description: Everything a single toast can be configured with.
 | `titlePosition` | `"top" \| "bottom"` | from `position` | Puts the title above or below the description. By default it sits at the toast's screen edge: on top for top positions, at the bottom for bottom positions. |
 | `duration` | `number \| null` | `5000`, `null` for loading toasts | Milliseconds until it is dismissed. `null` or `Infinity` keeps it. |
 | `action` | `{ label, onClick, dismiss? }` | — | A button shown with the title. `onClick(event, toast)` gets `{ id, dismiss }`. Set `dismiss: true` to close the toast after the click. |
-| `actionPlacement` | `"inline" \| "below"` | `"inline"` | `inline` puts the action right next to the title, `below` underneath it. |
+| `actionPlacement` | `"inline" \| "below"` | `"inline"` | `inline` puts the action right next to the title, `below` underneath it. With a `description`, the action always sits in the body, under the text. |
 | `actionVisibility` | `"always" \| "hover"` | `"always"` | `hover` only shows the action while the toast is hovered or focused. |
 | `dismissible` | `boolean` | `true` | Allows swipe, the close button and Escape. |
 | `autoExpand` | `boolean \| { delay?, hold? }` | `true` | Opens the body by itself when there is a description. `delay` is the wait before opening (default `220`); `hold` how long it stays open (default: until 1.5 s before it is dismissed, or for good when it has no duration). |

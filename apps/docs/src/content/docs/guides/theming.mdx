@@ -180,7 +180,9 @@ section[data-seintje][data-theme]
          │  └─ div[data-seintje-actions]
          │        └─ button[data-seintje-action]   (actionPlacement: "below")
          └─ div[data-seintje-body] › div[data-seintje-body-inner]
-               └─ div[data-seintje-description]
+               ├─ div[data-seintje-description]
+               └─ div[data-seintje-actions]   (moved here when there is a description)
+                     └─ button[data-seintje-action]
 ```
 
 The state attributes you can style:

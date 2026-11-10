@@ -288,6 +288,30 @@ describe("keyboard", () => {
     expect(inline?.parentElement?.hasAttribute("data-seintje-head-row")).toBe(true);
   });
 
+  test("with a description the action sits in the body, whatever the placement", () => {
+    const { api } = setup();
+    const id = api.show({
+      title: "a",
+      description: "text",
+      action: { label: "Do", onClick: () => {} },
+    });
+    api.show({
+      title: "b",
+      description: "text",
+      action: { label: "Do", onClick: () => {} },
+      actionPlacement: "below",
+    });
+    for (const button of host.querySelectorAll<HTMLButtonElement>("[data-seintje-action]")) {
+      expect(button.closest("[data-seintje-body]")).not.toBeNull();
+      expect(button.closest("[data-seintje-head]")).toBeNull();
+    }
+    // Losing the description moves it back to the title.
+    api.show({ id, title: "a", action: { label: "Do", onClick: () => {} } });
+    expect(host.querySelectorAll("[data-seintje-head-row] > [data-seintje-action]")).toHaveLength(
+      1,
+    );
+  });
+
   test("an action without a description leaves no body to open", () => {
     const { api } = setup();
     api.show({ title: "x", action: { label: "Do", onClick: () => {} } });

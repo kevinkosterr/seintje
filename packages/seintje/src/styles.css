@@ -217,6 +217,12 @@
   margin-top: -4px;
 }
 
+/* In the body, under the description and lined up with it. */
+[data-seintje-body-inner] > [data-seintje-actions] {
+  padding: 0;
+  margin-top: 10px;
+}
+
 [data-seintje-actions][hidden] {
   display: none;
 }

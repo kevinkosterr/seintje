@@ -89,7 +89,10 @@ export interface ToastOptions {
   /** Milliseconds before auto-dismissal. `null` or `Infinity` keeps it open. */
   duration?: number | null;
   action?: ToastAction;
-  /** Where the action button sits. Defaults to `"inline"`. */
+  /**
+   * Where the action button sits next to the title. Defaults to `"inline"`.
+   * With a description the action always sits in the body, under the text.
+   */
   actionPlacement?: ActionPlacement;
   /** When the action button is shown. Defaults to `"always"`. */
   actionVisibility?: ActionVisibility;

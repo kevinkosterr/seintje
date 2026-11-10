@@ -416,10 +416,15 @@ export class ToastView {
     this.actionButton.textContent = action?.label ?? "";
     this.actionButton.className = classList(classes.action);
     this.actionButton.dataset.type = type;
-    const inline = options.actionPlacement !== "below";
+    // With a description the action sits in the body, under the text, whatever
+    // `actionPlacement` says. Otherwise it goes with the title.
+    const inBody = hasContent(options.description);
+    const inline = !inBody && options.actionPlacement !== "below";
     this.actions.hidden = !action || inline;
     setAttr(this.element, "data-action-visibility", action ? options.actionVisibility : undefined);
-    // Only move the button when the placement changes, so it keeps focus otherwise.
+    // Only move nodes when the placement changes, so the button keeps focus otherwise.
+    const actionsParent = inBody ? this.bodyInner : this.head;
+    if (this.actions.parentElement !== actionsParent) actionsParent.append(this.actions);
     const parent = inline ? this.headRow : this.actions;
     if (this.actionButton.parentElement !== parent) {
       parent.insertBefore(this.actionButton, inline ? this.closeButton : null);
